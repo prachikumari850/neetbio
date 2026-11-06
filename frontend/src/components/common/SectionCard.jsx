@@ -34,6 +34,7 @@ function SectionCard({
     title,
     iconClassName = 'text-brand-purple',
     action,
+    meta,
     className,
     children,
 }) {
@@ -44,6 +45,9 @@ function SectionCard({
                     {Icon && <Icon className={cx('size-6 shrink-0', iconClassName)} />}
                     {title}
                 </h2>
+                {meta && (
+                    <span className="text-ink-700 shrink-0 text-sm font-medium">{meta}</span>
+                )}
                 {action && <SectionAction action={action} />}
             </div>
             {children}

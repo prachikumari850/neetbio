@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { BookOpen, Layers, LayoutGrid, List, Search, ArrowUpDown, X } from 'lucide-react'
+import { ArrowUpDown, BookOpen, Layers, LayoutGrid, List, Search, X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import Button from '@/components/common/Button'
 import EmptyState from '@/components/common/EmptyState'
@@ -51,6 +51,8 @@ function ExploreDiagrams() {
     const { isBookmarked, toggle } = useBookmarkToggle()
 
     const query = searchParams.get('q') ?? ''
+    const isSearching = query.trim() !== ''
+    const effectiveClassLevel = isSearching ? 'all' : filters.classLevel
     const openDiagram = diagrams.find((item) => item.id === searchParams.get('open'))
 
     const updateParam = (key, value) => {
@@ -70,6 +72,11 @@ function ExploreDiagrams() {
         setPage(1)
     }
 
+    const handleClassChange = (classLevel) => {
+        updateParam('q', '')
+        updateFilters({ classLevel, chapter: 'all', topic: 'all' })
+    }
+
     const toggleFilterValue = (group, id) => {
         const current = filters[group]
         updateFilters({
@@ -86,7 +93,7 @@ function ExploreDiagrams() {
     }
 
     const classScoped = diagrams.filter(
-        (diagram) => filters.classLevel === 'all' || diagram.classLevel === filters.classLevel,
+        (diagram) => effectiveClassLevel === 'all' || diagram.classLevel === effectiveClassLevel,
     )
     const chapters = [...new Set(classScoped.map((diagram) => diagram.chapter))]
     const topics = [
@@ -98,8 +105,12 @@ function ExploreDiagrams() {
     ]
 
     const results = useMemo(
-        () => sortDiagrams(filterDiagrams(diagrams, { ...filters, query }), filters.sort),
-        [filters, query],
+        () =>
+            sortDiagrams(
+                filterDiagrams(diagrams, { ...filters, classLevel: effectiveClassLevel, query }),
+                filters.sort,
+            ),
+        [filters, effectiveClassLevel, query],
     )
 
     const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE))
@@ -120,13 +131,7 @@ function ExploreDiagrams() {
 
             <div className="space-y-5 px-4 py-5 sm:px-6 lg:px-8">
                 <div className="flex flex-wrap items-end gap-4">
-                    <Tabs
-                        tabs={classTabs}
-                        activeTab={filters.classLevel}
-                        onChange={(classLevel) =>
-                            updateFilters({ classLevel, chapter: 'all', topic: 'all' })
-                        }
-                    />
+                    <Tabs tabs={classTabs} activeTab={effectiveClassLevel} onChange={handleClassChange} />
                     <SelectField
                         id="chapter"
                         label="Select Chapter"
@@ -166,7 +171,7 @@ function ExploreDiagrams() {
                                 {results.length} Diagrams Found
                             </h2>
 
-                            {query && (
+                            {isSearching && (
                                 <button
                                     type="button"
                                     onClick={() => updateParam('q', '')}

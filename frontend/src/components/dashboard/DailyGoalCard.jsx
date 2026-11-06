@@ -24,11 +24,9 @@ function DailyGoalCard({ className }) {
             icon={Calendar}
             title="Daily Goal"
             iconClassName="text-danger"
+            meta={`${completedCount} / ${tasks.length} Tasks`}
             className={cx('relative overflow-hidden', className)}
         >
-            <p className="text-ink-700 -mt-10 mb-5 text-right text-sm font-medium">
-                {completedCount} / {tasks.length} Tasks
-            </p>
             <ProgressBar value={(completedCount / tasks.length) * 100} />
 
             <ul className="mt-4 space-y-3">

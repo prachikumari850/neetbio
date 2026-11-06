@@ -20,7 +20,6 @@ import { practiceTabs, recommendedTestIds, testCatalog } from '@/data/mockPracti
 import { useTestStore } from '@/store/useTestStore'
 import { toMinutes } from '@/utils/formatters'
 import { buildTest, evaluateTest } from '@/utils/testBuilder'
-import { BookOpen, ClipboardList, Layers } from 'lucide-react'
 
 const recommendedTests = recommendedTestIds
     .map((id) => testCatalog.find((test) => test.id === id))

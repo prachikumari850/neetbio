@@ -9,6 +9,8 @@ import {
     Target,
 } from 'lucide-react'
 
+const DIAGRAM_SEARCH_PATH = '/diagrams'
+
 export const navigationItems = [
     {
         key: 'dashboard',
@@ -16,7 +18,7 @@ export const navigationItems = [
         path: '/dashboard',
         icon: House,
         searchPlaceholder: 'Search diagrams, topics, questions...',
-        searchPath: '/diagrams',
+        searchPath: DIAGRAM_SEARCH_PATH,
     },
     {
         key: 'diagrams',
@@ -32,6 +34,7 @@ export const navigationItems = [
         icon: Sparkles,
         badge: 'New',
         searchPlaceholder: 'Search topics, diagrams, questions...',
+        searchPath: DIAGRAM_SEARCH_PATH,
     },
     {
         key: 'practice',
@@ -39,6 +42,7 @@ export const navigationItems = [
         path: '/practice',
         icon: Target,
         searchPlaceholder: 'Search topics, diagrams, tests...',
+        searchPath: DIAGRAM_SEARCH_PATH,
     },
     {
         key: 'my-learning',
@@ -46,6 +50,7 @@ export const navigationItems = [
         path: '/my-learning',
         icon: BookOpen,
         searchPlaceholder: 'Search your learning, notes, diagrams...',
+        searchPath: DIAGRAM_SEARCH_PATH,
     },
     {
         key: 'analytics',
@@ -53,6 +58,7 @@ export const navigationItems = [
         path: '/analytics',
         icon: ChartColumn,
         searchPlaceholder: 'Search topics, chapters, tests...',
+        searchPath: DIAGRAM_SEARCH_PATH,
     },
     {
         key: 'bookmarks',
@@ -67,6 +73,7 @@ export const navigationItems = [
         path: '/settings',
         icon: Settings,
         searchPlaceholder: 'Search topics, diagrams, tests...',
+        searchPath: DIAGRAM_SEARCH_PATH,
     },
 ]
 
