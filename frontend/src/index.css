@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-navy-950: #081538;
+  --color-navy-900: #0b1f5c;
+  --color-navy-800: #12307f;
+
+  --color-brand-orange: #f97316;
+  --color-brand-orange-dark: #ea580c;
+  --color-brand-orange-soft: #fff1e6;
+
+  --color-brand-purple: #6d3ae6;
+  --color-brand-purple-dark: #5a2bd1;
+  --color-brand-purple-soft: #ece6ff;
+
+  --color-accent-pink: #ec4899;
+  --color-success: #16a34a;
+  --color-success-soft: #e3f7e8;
+  --color-danger: #ef4444;
+  --color-danger-soft: #fde8e8;
+  --color-info: #2563eb;
+  --color-info-soft: #e1ecff;
+
+  --color-ink-900: #0f172a;
+  --color-ink-700: #334155;
+  --color-ink-500: #64748b;
+  --color-line: #e6e1f5;
+  --color-surface: #ffffff;
+  --color-page: #f6f2ff;
+
+  --radius-card: 1.25rem;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 4px 18px rgba(109, 58, 230, 0.08);
+  --shadow-raised: 0 8px 28px rgba(109, 58, 230, 0.16);
+
+  --spacing-sidebar: 16.875rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    color: var(--color-ink-900);
+    background-color: var(--color-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-purple);
+    outline-offset: 2px;
+  }
+}
+
+@utility bg-sidebar {
+  background-image: linear-gradient(180deg,
+      var(--color-navy-800) 0%,
+      var(--color-navy-900) 45%,
+      var(--color-navy-950) 100%);
+}
+
+@utility bg-page-gradient {
+  background-image: linear-gradient(135deg,
+      #fdf4ff 0%,
+      var(--color-page) 45%,
+      #ffffff 100%);
+}
+
+@utility bg-banner {
+  background-image: linear-gradient(100deg,
+      #f1e9ff 0%,
+      #fbeaf6 50%,
+      #efe8ff 100%);
+}
+
+@utility bg-action-orange {
+  background-image: linear-gradient(90deg,
+      var(--color-brand-orange) 0%,
+      var(--color-brand-orange-dark) 100%);
+}
+
+@utility bg-action-purple {
+  background-image: linear-gradient(90deg,
+      #7c4dff 0%,
+      var(--color-brand-purple-dark) 100%);
+}

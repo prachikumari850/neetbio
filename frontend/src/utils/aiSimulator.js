@@ -1,0 +1,91 @@
+import {
+    diagramTemplates,
+    fallbackReply,
+    simulatedReplies,
+} from '@/data/mockAi'
+
+const STOP_WORDS = new Set([
+    'the', 'and', 'that', 'with', 'this', 'from', 'are', 'for', 'was', 'were',
+    'which', 'their', 'have', 'has', 'into', 'also', 'such', 'can', 'its', 'but',
+    'not', 'these', 'those', 'than', 'then', 'they', 'when', 'where', 'while',
+])
+
+export function createMessage(role, content) {
+    return {
+        id: `${role}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        role,
+        content,
+    }
+}
+
+export function getSimulatedReply(question) {
+    const text = question.toLowerCase()
+    const match = simulatedReplies.find(({ keywords }) =>
+        keywords.some((keyword) => text.includes(keyword)),
+    )
+
+    return match ? match.content : fallbackReply
+}
+
+export function buildImageAnalysis(fileName) {
+    return [
+        `**Simulated analysis for \`${fileName}\`**`,
+        'No AI model has looked at this image yet. Once the backend is connected, this panel will show:',
+        '- The diagram or structure that was identified',
+        '- Key components and what each one does',
+        '- NEET-focused notes and likely exam questions',
+    ].join('\n\n')
+}
+
+export function findDiagramTemplate(prompt) {
+    const text = prompt.toLowerCase()
+    const match = diagramTemplates.find(({ keywords }) =>
+        keywords.some((keyword) => text.includes(keyword)),
+    )
+
+    if (match) {
+        return match
+    }
+
+    return {
+        title: prompt.trim().slice(0, 40),
+        labels: ['Structure A', 'Structure B', 'Structure C', 'Structure D'],
+    }
+}
+
+function getWords(text) {
+    return text.toLowerCase().match(/[a-z]{4,}/g) ?? []
+}
+
+export function summarizeNotes(text) {
+    const sentences = text
+        .split(/(?<=[.!?])\s+/)
+        .map((sentence) => sentence.trim())
+        .filter((sentence) => sentence.length > 20)
+
+    const frequency = new Map()
+    getWords(text)
+        .filter((word) => !STOP_WORDS.has(word))
+        .forEach((word) => frequency.set(word, (frequency.get(word) ?? 0) + 1))
+
+    const keyPoints = sentences
+        .map((sentence, index) => ({
+            sentence,
+            index,
+            score: getWords(sentence).reduce(
+                (total, word) => total + (frequency.get(word) ?? 0),
+                0,
+            ),
+        }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .sort((a, b) => a.index - b.index)
+        .map(({ sentence }) => sentence)
+
+    const keyTerms = [...frequency.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6)
+        .map(([word]) => word)
+
+    return { keyPoints, keyTerms }
+}
