@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowRight, GraduationCap, House, Mail, User } from 'lucide-react'
+import { ArrowRight, GraduationCap, House, Mail } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthField from '@/components/auth/AuthField'
@@ -108,7 +108,6 @@ function Login() {
                             type="text"
                             label="Email or Username"
                             icon={Mail}
-                            outerIcon={User}
                             placeholder="Enter your email or username"
                             autoComplete="username"
                             value={values.identifier}

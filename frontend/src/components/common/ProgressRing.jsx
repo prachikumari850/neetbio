@@ -32,7 +32,10 @@ function ProgressRing({
                     className={barClassName}
                 />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <div
+                className="absolute inset-0 flex flex-col items-center justify-center text-center [&>*]:max-w-full [&>*]:leading-tight"
+                style={{ padding: strokeWidth + 7, boxSizing: 'border-box' }}
+            >
                 {children}
             </div>
         </div>

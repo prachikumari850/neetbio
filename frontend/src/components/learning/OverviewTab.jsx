@@ -79,7 +79,7 @@ function OverviewTab({ notes, onTabChange }) {
                                     className="hover:bg-page flex items-center gap-3 rounded-lg px-1 py-1.5"
                                 >
                                     <Icon className={cx('size-6 shrink-0', tone)} />
-                                    <span className="w-36 shrink-0 text-sm font-bold">{label}</span>
+                                    <span className="min-w-0 flex-1 text-sm font-bold">{label}</span>
                                     <ProgressBar value={value} className="flex-1" />
                                     <span className="w-10 text-right text-sm font-bold">{value}%</span>
                                     <ChevronRight className="size-4 shrink-0" />

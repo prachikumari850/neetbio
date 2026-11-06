@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Bot, FileText, History, Image as ImageIcon, MessageSquare, Sparkles, Zap } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import AnalyzeImagePanel from '@/components/ai/AnalyzeImagePanel'
@@ -28,6 +28,7 @@ const DEFAULT_CHAT_COUNT = 3
 function AILearn() {
     const [searchParams, setSearchParams] = useSearchParams()
     const generation = useDiagramGeneration()
+    const sessionNumber = useRef(0)
     const [chatSession, setChatSession] = useState(() => ({
         key: 'new',
         messages: [welcomeMessage],
@@ -42,12 +43,17 @@ function AILearn() {
     const setActiveTab = (tabId) => setSearchParams({ tab: tabId })
 
     const startChat = (prompt) => {
-        setChatSession({ key: `chat-${Date.now()}`, messages: [welcomeMessage], prompt })
+        sessionNumber.current += 1
+        setChatSession({
+            key: `new-session-${sessionNumber.current}`,
+            messages: [welcomeMessage],
+            prompt,
+        })
         setActiveTab('chat')
     }
 
     const openRecentChat = (chat) => {
-        setChatSession({ key: chat.id, messages: chat.messages, prompt: null })
+        setChatSession({ key: `recent-${chat.id}`, messages: chat.messages, prompt: null })
         setActiveTab('chat')
     }
 
