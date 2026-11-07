@@ -5,8 +5,6 @@ export const useSettingsStore = create(
     persist(
         (set) => ({
             profile: {
-                phone: '+91 98765 43210',
-                joined: 'Oct 15, 2026',
                 learningGoal: 'NEET 2027',
                 targetScore: '650+',
             },

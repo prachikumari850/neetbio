@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react'
 import { ChevronDown, LogOut, Settings } from 'lucide-react'
-import toast from 'react-hot-toast'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Avatar from '@/components/common/Avatar'
 import { useClickOutside } from '@/hooks/useClickOutside'
+import { logout } from '@/services/authService'
 import { useUserStore } from '@/store/useUserStore'
 
 const menuItemClasses =
@@ -12,15 +12,20 @@ const menuItemClasses =
 function UserMenu() {
     const [isOpen, setIsOpen] = useState(false)
     const menuRef = useRef(null)
-    const navigate = useNavigate()
     const user = useUserStore((state) => state.user)
 
     useClickOutside(menuRef, () => setIsOpen(false))
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setIsOpen(false)
-        toast.success('Logged out successfully')
-        navigate('/login')
+
+        try {
+            await logout()
+        } catch {
+            // The local session is cleared even when the server call fails.
+        }
+
+        window.location.assign('/login')
     }
 
     return (

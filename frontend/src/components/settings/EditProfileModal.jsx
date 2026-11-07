@@ -4,17 +4,9 @@ import AuthField from '@/components/auth/AuthField'
 import Button from '@/components/common/Button'
 import Modal from '@/components/common/Modal'
 import { useForm } from '@/hooks/useForm'
-import { useSettingsStore } from '@/store/useSettingsStore'
+import { updateProfile } from '@/services/userService'
 import { useUserStore } from '@/store/useUserStore'
 import { getEmailError, getMobileError } from '@/utils/validators'
-
-function toDigits(phone) {
-    return phone.replace(/\D/g, '').slice(-10)
-}
-
-function formatPhone(digits) {
-    return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`
-}
 
 function validateProfile({ name, email, phone }) {
     const errors = {}
@@ -39,17 +31,27 @@ function validateProfile({ name, email, phone }) {
 function ProfileForm({ onClose }) {
     const user = useUserStore((state) => state.user)
     const setUser = useUserStore((state) => state.setUser)
-    const profilePhone = useSettingsStore((state) => state.profile.phone)
-    const updateSection = useSettingsStore((state) => state.updateSection)
 
-    const { values, errors, handleChange, handleSubmit } = useForm({
-        initialValues: { name: user.name, email: user.email, phone: toDigits(profilePhone) },
+    const { values, errors, isSubmitting, handleChange, handleSubmit } = useForm({
+        initialValues: {
+            name: user.fullName || user.name,
+            email: user.email,
+            phone: user.mobile,
+        },
         validate: validateProfile,
-        onSubmit: ({ name, email, phone }) => {
-            setUser({ name: name.trim(), email: email.trim() })
-            updateSection('profile', { phone: formatPhone(phone.trim()) })
-            toast.success('Profile updated')
-            onClose()
+        onSubmit: async ({ name, email, phone }) => {
+            try {
+                const updatedUser = await updateProfile({
+                    name: name.trim(),
+                    email: email.trim(),
+                    mobile: phone.trim(),
+                })
+                setUser(updatedUser)
+                toast.success('Profile updated')
+                onClose()
+            } catch (error) {
+                toast.error(error.message)
+            }
         },
     })
 
@@ -86,8 +88,8 @@ function ProfileForm({ onClose }) {
                 onChange={handleChange}
                 error={errors.phone}
             />
-            <Button type="submit" className="w-full">
-                Save Changes
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
         </form>
     )

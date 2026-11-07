@@ -1,13 +1,19 @@
 import { create } from 'zustand'
 
+const guestUser = {
+    name: 'Student',
+    fullName: '',
+    role: 'NEET Aspirant',
+    email: '',
+    mobile: '',
+    joinedAt: null,
+    avatar: '/images/avatar.png',
+    streak: 12,
+}
+
 export const useUserStore = create((set) => ({
-    user: {
-        name: 'Ashu',
-        role: 'NEET Aspirant',
-        email: 'ashu@example.com',
-        avatar: '/images/avatar.png',
-        streak: 12,
-    },
+    user: guestUser,
     setUser: (details) =>
         set((state) => ({ user: { ...state.user, ...details } })),
+    resetUser: () => set({ user: guestUser }),
 }))

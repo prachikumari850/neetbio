@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" fill="none">
+  <defs>
+    <radialGradient id="ambient" cx="0" cy="0" r="1" gradientTransform="matrix(0 390 -390 0 406 388)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity=".96"/><stop offset=".56" stop-color="#f4edff" stop-opacity=".82"/><stop offset="1" stop-color="#e9ddff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tubule" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#fff1a0"/><stop offset=".35" stop-color="#ffc943"/><stop offset=".7" stop-color="#f59a2d"/><stop offset="1" stop-color="#db672e"/>
+    </linearGradient>
+    <linearGradient id="tubuleLight" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#fffbd3"/><stop offset=".48" stop-color="#ffe47b"/><stop offset="1" stop-color="#f2a73a"/>
+    </linearGradient>
+    <linearGradient id="bloodRed" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#ffb3a8"/><stop offset=".45" stop-color="#f15b68"/><stop offset="1" stop-color="#b92f67"/>
+    </linearGradient>
+    <linearGradient id="bloodBlue" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#a9efff"/><stop offset=".48" stop-color="#58a9ec"/><stop offset="1" stop-color="#5559c5"/>
+    </linearGradient>
+    <linearGradient id="capsule" x1="228" x2="353" y1="145" y2="294" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f5dfff"/><stop offset=".5" stop-color="#d19bf4"/><stop offset="1" stop-color="#9871da"/>
+    </linearGradient>
+    <linearGradient id="capillary" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#ffd0e7"/><stop offset="1" stop-color="#c281db"/>
+    </linearGradient>
+    <filter id="shadow" width="1.6" height="1.55" x="-.3" y="-.2" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="13"/><feOffset dy="19"/><feColorMatrix values="0 0 0 0 .23 0 0 0 0 .13 0 0 0 0 .42 0 0 0 .27 0"/><feBlend in2="SourceGraphic"/><feComposite in2="SourceAlpha" operator="in"/>
+    </filter>
+    <filter id="glow" width="1.8" height="1.8" x="-.4" y="-.4" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="17"/></filter>
+    <filter id="detailShadow" width="1.4" height="1.45" x="-.2" y="-.18" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dy="7"/><feComponentTransfer><feFuncA slope=".18" type="linear"/></feComponentTransfer><feBlend in2="SourceGraphic"/><feComposite in2="SourceAlpha" operator="in"/>
+    </filter>
+  </defs>
+
+  <circle cx="405" cy="390" r="383" fill="url(#ambient)"/>
+  <circle cx="364" cy="398" r="245" fill="#c69bff" opacity=".2" filter="url(#glow)"/>
+  <circle cx="355" cy="393" r="177" fill="#ffc96b" opacity=".12" filter="url(#glow)"/>
+
+  <!-- Capillary network following the nephron tubules -->
+  <g stroke-linecap="round" stroke-linejoin="round" opacity=".82">
+    <path d="M243 302c-63 47-78 97-54 143 18 35 5 70 29 104 23 34 65 35 71 77m5-357c56 45 66 88 40 131-23 37-3 72-16 106-15 40-47 57-42 103" stroke="url(#bloodBlue)" stroke-width="15"/>
+    <path d="M225 326c-40 42-49 74-30 105m30 10c-9 34 9 55 24 72m53-190c35 34 43 63 25 94m-19 24c-10 38-1 59 16 79m-26-194c49 38 57 65 37 99m-5 56c-6 25-2 42 11 57" stroke="url(#bloodRed)" stroke-width="12"/>
+    <path d="M205 378c31-25 56-21 74 4m-70 76c30-25 55-22 77 1m-60 73c34-20 57-12 73 12m12-172c26-20 48-17 66 5m-47 87c30-24 52-19 71 6m-77 67c28-18 50-11 67 14" stroke="#ffd4e9" stroke-width="5" opacity=".9"/>
+  </g>
+
+  <!-- Afferent and efferent arterioles -->
+  <g stroke-linecap="round" stroke-linejoin="round" filter="url(#detailShadow)">
+    <path d="M94 222c46 0 73-12 111-34" stroke="url(#bloodRed)" stroke-width="30"/>
+    <path d="M100 214c38-1 68-11 97-27" stroke="#ffe2da" stroke-width="6" opacity=".8"/>
+    <path d="M344 207c45-30 74-42 123-41" stroke="url(#bloodBlue)" stroke-width="25"/>
+    <path d="M351 201c39-24 71-34 109-33" stroke="#e1faff" stroke-width="5" opacity=".8"/>
+  </g>
+
+  <!-- Bowman's capsule around the glomerulus -->
+  <g filter="url(#shadow)">
+    <ellipse cx="282" cy="222" rx="101" ry="91" fill="url(#capsule)" stroke="#fff1ff" stroke-width="8"/>
+    <ellipse cx="282" cy="222" rx="82" ry="72" fill="#fff8ff" fill-opacity=".88" stroke="#ba92e8" stroke-width="5"/>
+    <ellipse cx="282" cy="222" rx="70" ry="61" fill="#efdcfb" opacity=".62"/>
+  </g>
+
+  <!-- Glomerular tuft: branching red and blue capillaries -->
+  <g stroke-linecap="round" stroke-linejoin="round" filter="url(#detailShadow)">
+    <path d="M208 222c9-48 58-70 92-42 31 25 28 72-4 93-31 20-79 3-83-31-4-28 24-47 47-35 22 11 18 43-3 50-18 6-34-9-28-24 5-12 22-12 25-2" stroke="url(#bloodRed)" stroke-width="13"/>
+    <path d="M350 225c-11-42-52-61-81-39-24 18-25 55-2 72 22 17 57 8 63-17 5-21-17-36-34-27-13 7-11 26 2 29" stroke="url(#bloodBlue)" stroke-width="12"/>
+    <path d="M214 201c26 21 46 22 67 2m-64 42c27-16 50-12 65 10m4-64c-6 28 1 48 25 60m-8-74c17 23 19 42 8 59" stroke="#fff" stroke-width="4" opacity=".75"/>
+  </g>
+  <circle cx="265" cy="186" r="6" fill="#fff" opacity=".86"/>
+
+  <!-- Proximal convoluted tubule: broad, folded golden segment -->
+  <path d="M347 281c48 11 72 34 64 57-8 23-46 7-57 27-12 23 31 37 21 61-9 22-47 9-60 28-17 25 28 43 13 66-14 21-47 3-60 22-15 22 7 39 27 44" stroke="#b76c2d" stroke-width="43" stroke-linecap="round" stroke-linejoin="round" opacity=".24" filter="url(#glow)"/>
+  <path d="M347 281c48 11 72 34 64 57-8 23-46 7-57 27-12 23 31 37 21 61-9 22-47 9-60 28-17 25 28 43 13 66-14 21-47 3-60 22-15 22 7 39 27 44" stroke="url(#tubule)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" filter="url(#detailShadow)"/>
+  <path d="M347 275c36 10 54 24 51 37m-92 61c-4 10 5 19 19 26m-27 59c-8 11-3 21 12 31m-58 47c-4 11 2 19 14 27" stroke="#fff5bd" stroke-width="7" stroke-linecap="round" opacity=".8"/>
+
+  <!-- Loop of Henle: descending and ascending limbs -->
+  <path d="M294 548v71c0 41 27 64 63 64s63-23 63-64V510" stroke="#a55f36" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" opacity=".22" filter="url(#glow)"/>
+  <path d="M294 548v71c0 41 27 64 63 64s63-23 63-64V510" stroke="url(#tubule)" stroke-width="38" stroke-linecap="round" stroke-linejoin="round" filter="url(#detailShadow)"/>
+  <path d="M286 564v57c0 39 28 72 71 72s72-31 72-72v-91" stroke="url(#tubuleLight)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+
+  <!-- Distal convoluted tubule -->
+  <path d="M426 478c36-21 69-7 65 15-4 22-38 17-43 37-6 24 33 31 29 52-4 19-30 20-39 35" stroke="url(#tubule)" stroke-width="29" stroke-linecap="round" stroke-linejoin="round" filter="url(#detailShadow)"/>
+  <path d="M429 475c19-10 35-10 45-3m-20 73c13 4 21 12 22 22" stroke="#fff4bc" stroke-width="6" stroke-linecap="round" opacity=".86"/>
+
+  <!-- Collecting duct -->
+  <path d="M516 279v379c0 35 16 54 47 68" stroke="#a95731" stroke-width="51" stroke-linecap="round" stroke-linejoin="round" opacity=".22" filter="url(#glow)"/>
+  <path d="M516 279v379c0 35 16 54 47 68" stroke="url(#tubule)" stroke-width="39" stroke-linecap="round" stroke-linejoin="round" filter="url(#detailShadow)"/>
+  <path d="M508 300v347c0 29 13 46 36 58" stroke="url(#tubuleLight)" stroke-width="12" stroke-linecap="round" opacity=".92"/>
+
+  <!-- Fine glomerular and peritubular vessel detail -->
+  <g fill="#fff" opacity=".94">
+    <circle cx="226" cy="212" r="4"/><circle cx="302" cy="169" r="3.5"/><circle cx="335" cy="239" r="4"/><circle cx="227" cy="251" r="3"/>
+    <circle cx="406" cy="370" r="3.5"/><circle cx="361" cy="432" r="3"/><circle cx="256" cy="517" r="3.5"/><circle cx="453" cy="549" r="3"/>
+  </g>
+  <g fill="#ffb54b">
+    <path d="m594 333 5 14 14 5-14 5-5 14-5-14-14-5 14-5 5-14Z"/>
+    <path d="m163 371 3 9 9 3-9 3-3 9-3-9-9-3 9-3 3-9Z" opacity=".9"/>
+  </g>
+</svg>

@@ -7,6 +7,7 @@ import Card from '@/components/common/Card'
 import SelectField from '@/components/common/SelectField'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useUserStore } from '@/store/useUserStore'
+import { formatLongDate, formatPhone } from '@/utils/formatters'
 
 const LEARNING_GOALS = ['NEET 2026', 'NEET 2027', 'NEET 2028']
 const TARGET_SCORES = ['550+', '600+', '650+', '700+']
@@ -18,8 +19,8 @@ function AccountCard({ onEditProfile }) {
 
     const contactDetails = [
         { icon: Mail, text: user.email },
-        { icon: Phone, text: profile.phone },
-        { icon: Calendar, text: `Joined: ${profile.joined}` },
+        { icon: Phone, text: formatPhone(user.mobile) },
+        { icon: Calendar, text: `Joined: ${formatLongDate(user.joinedAt)}` },
     ]
 
     return (
@@ -45,14 +46,14 @@ function AccountCard({ onEditProfile }) {
                         <button
                             type="button"
                             aria-label="Change photo"
-                            onClick={() => toast('Photo upload will be available once the backend is connected.')}
+                            onClick={() => toast('Photo upload is not available yet.')}
                             className="border-line absolute right-0 bottom-0 flex size-8 items-center justify-center rounded-full border bg-white shadow"
                         >
                             <Camera className="size-4" />
                         </button>
                     </div>
                     <div>
-                        <p className="text-2xl font-extrabold">{user.name}</p>
+                        <p className="text-2xl font-extrabold">{user.fullName || user.name}</p>
                         <p className="text-ink-700 text-sm">{user.role}</p>
                         <Badge className="mt-2">
                             <GraduationCap className="mr-1 size-4" />

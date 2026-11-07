@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" fill="none">
+  <defs>
+    <radialGradient id="ambient" cx="0" cy="0" r="1" gradientTransform="matrix(0 390 -390 0 406 388)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity=".96"/><stop offset=".56" stop-color="#f4edff" stop-opacity=".82"/><stop offset="1" stop-color="#e9ddff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="muscle" x1="199" x2="526" y1="270" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff9b9a"/><stop offset=".38" stop-color="#e94d6d"/><stop offset=".75" stop-color="#b93162"/><stop offset="1" stop-color="#762a83"/>
+    </linearGradient>
+    <linearGradient id="muscleLight" x1="241" x2="445" y1="315" y2="566" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffb7ab"/><stop offset=".48" stop-color="#f16b79"/><stop offset="1" stop-color="#c63f70"/>
+    </linearGradient>
+    <linearGradient id="oxygenated" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#ffb0a1"/><stop offset=".47" stop-color="#ee647a"/><stop offset="1" stop-color="#a82f70"/>
+    </linearGradient>
+    <linearGradient id="deoxygenated" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#9feaff"/><stop offset=".48" stop-color="#569ce8"/><stop offset="1" stop-color="#554ab9"/>
+    </linearGradient>
+    <linearGradient id="aorta" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#ffba8a"/><stop offset=".4" stop-color="#f66b68"/><stop offset="1" stop-color="#bc356e"/>
+    </linearGradient>
+    <linearGradient id="vein" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#a3edff"/><stop offset=".46" stop-color="#49a7e8"/><stop offset="1" stop-color="#5961c8"/>
+    </linearGradient>
+    <linearGradient id="valve" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#fff1da"/><stop offset="1" stop-color="#e6a9d1"/>
+    </linearGradient>
+    <filter id="shadow" width="1.6" height="1.55" x="-.3" y="-.2" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="13"/><feOffset dy="19"/><feColorMatrix values="0 0 0 0 .23 0 0 0 0 .13 0 0 0 0 .42 0 0 0 .28 0"/><feBlend in2="SourceGraphic"/><feComposite in2="SourceAlpha" operator="in"/>
+    </filter>
+    <filter id="glow" width="1.8" height="1.8" x="-.4" y="-.4" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="17"/></filter>
+    <filter id="detailShadow" width="1.4" height="1.45" x="-.2" y="-.18" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dy="7"/><feComponentTransfer><feFuncA slope=".19" type="linear"/></feComponentTransfer><feBlend in2="SourceGraphic"/><feComposite in2="SourceAlpha" operator="in"/>
+    </filter>
+  </defs>
+
+  <circle cx="405" cy="390" r="383" fill="url(#ambient)"/>
+  <circle cx="360" cy="399" r="244" fill="#c69bff" opacity=".2" filter="url(#glow)"/>
+  <circle cx="353" cy="394" r="194" fill="#ffabb2" opacity=".14" filter="url(#glow)"/>
+
+  <!-- Major vessels behind the heart -->
+  <g stroke-linecap="round" stroke-linejoin="round" filter="url(#detailShadow)">
+    <!-- Superior and inferior vena cava -->
+    <path d="M259 290V168c0-28 19-48 46-48h9v211" stroke="url(#vein)" stroke-width="42"/>
+    <path d="M270 177v98m0 258v104c0 27 17 46 43 53" stroke="url(#vein)" stroke-width="40"/>
+    <path d="M259 177v95m0 267v90" stroke="#dcf9ff" stroke-linecap="round" stroke-width="8" opacity=".66"/>
+    <!-- Pulmonary veins return oxygenated blood to the left atrium -->
+    <path d="M462 337c64-31 92-51 131-50m-127 76c68-5 99 2 140 22" stroke="url(#aorta)" stroke-width="28"/>
+    <path d="M481 340c46-20 75-31 106-32m-101 58c48 0 75 6 107 17" stroke="#ffd0be" stroke-linecap="round" stroke-width="5" opacity=".7"/>
+    <!-- Aorta and its three branches -->
+    <path d="M372 329V237c0-67 47-104 99-91 41 10 61 43 56 80l-9 68" stroke="url(#aorta)" stroke-width="48"/>
+    <path d="M415 153c-1-32 1-55-7-75m42 69c8-25 17-44 17-69m37 88c20-17 37-31 56-39" stroke="url(#aorta)" stroke-width="27"/>
+    <path d="M378 249v67m0-164c-2-25-3-41-8-55m79 15c8-21 13-30 16-47m57 89c14-13 24-20 37-26" stroke="#ffd1bd" stroke-linecap="round" stroke-width="7" opacity=".7"/>
+    <!-- Pulmonary artery crosses in front of the aorta -->
+    <path d="M360 339c-30-34-65-54-108-51-38 3-66 24-84 55m194-4c31-35 60-54 100-57 28-2 53 5 72 20" stroke="url(#vein)" stroke-width="39"/>
+    <path d="M354 334c-35-32-66-41-98-38m113 38c34-29 58-39 92-39" stroke="#d8f7ff" stroke-linecap="round" stroke-width="7" opacity=".75"/>
+  </g>
+
+  <!-- Heart muscle silhouette -->
+  <path d="M359 635c-47-35-153-106-192-204-38-95 3-177 84-188 55-8 95 18 122 62 25-51 69-82 126-73 82 13 113 100 72 190-46 101-151 171-212 213Z" fill="#7045bd" opacity=".28" filter="url(#glow)"/>
+  <g filter="url(#shadow)">
+    <path d="M358 617c-47-35-144-101-180-190-35-85 2-159 73-169 49-7 85 18 109 55 24-44 62-70 113-63 72 10 101 86 65 166-41 91-132 155-180 199Z" fill="url(#muscle)" stroke="#ffd3ce" stroke-width="8"/>
+    <path d="M359 595c-42-34-124-89-154-163-27-67 1-124 57-132 43-7 74 18 94 53 24-35 58-54 98-46 57 11 75 70 48 130-33 74-102 124-143 158Z" fill="url(#muscleLight)" stroke="#ffc1b8" stroke-width="4"/>
+  </g>
+
+  <!-- Internal chambers: anatomical right heart in blue, left heart in red -->
+  <path d="M253 337c-27 5-45 31-39 61 5 27 26 44 55 43 20-1 38-12 52-28v-61c-20-14-44-20-68-15Z" fill="url(#deoxygenated)" stroke="#d9f4ff" stroke-width="5" filter="url(#detailShadow)"/>
+  <path d="M230 440c-28 11-38 42-24 75 18 42 68 80 113 108 19-34 31-75 27-119-3-34-12-59-27-79-28-3-62 3-89 15Z" fill="url(#deoxygenated)" stroke="#d6edff" stroke-width="5" filter="url(#detailShadow)"/>
+  <path d="M425 325c29-5 56 12 64 39 9 29-5 55-32 67-19 8-41 8-65-1l-9-70c10-18 23-30 42-35Z" fill="url(#oxygenated)" stroke="#ffe0d8" stroke-width="5" filter="url(#detailShadow)"/>
+  <path d="M398 436c23-22 51-31 78-28 34 4 49 32 39 68-12 47-54 93-102 130-22-30-39-70-41-111-2-25 6-44 26-59Z" fill="url(#oxygenated)" stroke="#ffd9d0" stroke-width="5" filter="url(#detailShadow)"/>
+
+  <!-- Septum and chamber walls -->
+  <path d="M354 369c-1 42 3 80 11 120 7 38 5 72-6 104" stroke="#8d315f" stroke-linecap="round" stroke-width="14" opacity=".82"/>
+  <path d="M359 382c3 34 7 63 13 91" stroke="#ffd3c8" stroke-linecap="round" stroke-width="5" opacity=".8"/>
+  <path d="M329 394c-12 4-20 12-24 24m107-28c14 3 23 11 27 24" stroke="url(#valve)" stroke-linecap="round" stroke-width="9"/>
+  <path d="M302 415c12 13 22 20 34 24m80-23c-12 12-22 18-34 22" stroke="#f8e7df" stroke-linecap="round" stroke-width="4" opacity=".9"/>
+
+  <!-- Papillary muscle ridges and highlights -->
+  <g stroke-linecap="round" opacity=".6">
+    <path d="M244 476c15 32 38 55 67 72m-58-46c17 30 39 51 68 66m106-78c-13 30-33 54-59 74m77-48c-14 29-34 51-58 66" stroke="#ffe3d7" stroke-width="5"/>
+    <path d="M240 354c13-18 32-25 51-22m149-3c17 2 29 11 36 25" stroke="#fff" stroke-width="7"/>
+  </g>
+
+  <!-- Valves and flow highlights -->
+  <g fill="#fff" opacity=".95">
+    <circle cx="297" cy="352" r="4"/><circle cx="316" cy="368" r="3"/><circle cx="433" cy="356" r="4"/><circle cx="455" cy="374" r="3"/>
+    <circle cx="274" cy="498" r="3.5"/><circle cx="311" cy="535" r="3"/><circle cx="439" cy="494" r="3.5"/><circle cx="464" cy="464" r="3"/>
+  </g>
+
+  <!-- Scientific glints in the lavender atmosphere -->
+  <g fill="#fff">
+    <circle cx="143" cy="239" r="5" opacity=".9"/><circle cx="584" cy="225" r="4" opacity=".86"/><circle cx="568" cy="454" r="4" opacity=".85"/><circle cx="177" cy="548" r="4" opacity=".8"/>
+  </g>
+  <g fill="#ffb54b">
+    <path d="m594 314 5 14 14 5-14 5-5 14-5-14-14-5 14-5 5-14Z"/>
+    <path d="m159 326 3 9 9 3-9 3-3 9-3-9-9-3 9-3 3-9Z" opacity=".9"/>
+  </g>
+</svg>

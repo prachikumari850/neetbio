@@ -1,62 +1,41 @@
-const registeredUsers = [
-    {
-        name: 'Ashu',
-        username: 'ashu',
-        email: 'ashu@example.com',
-        mobile: '9876543210',
-        password: 'neetbio123',
-    },
-]
+import { apiClient } from '@/services/apiClient'
+import { toUser } from '@/services/userService'
+import { useAuthStore } from '@/store/useAuthStore'
 
 const SIMULATED_DELAY_MS = 700
 
-function wait() {
-    return new Promise((resolve) => setTimeout(resolve, SIMULATED_DELAY_MS))
-}
-
-function toPublicUser({ name, email }) {
-    return { name: name.split(' ')[0], email }
+function startSession({ access_token: token, user }) {
+    useAuthStore.getState().setToken(token)
+    return toUser(user)
 }
 
 export async function login({ identifier, password }) {
-    await wait()
-
-    const key = identifier.trim().toLowerCase()
-    const user = registeredUsers.find(
-        (candidate) => candidate.email === key || candidate.username === key,
-    )
-
-    if (!user || user.password !== password) {
-        throw new Error('Incorrect email/username or password.')
-    }
-
-    return toPublicUser(user)
+    const { data } = await apiClient.post('/auth/login', {
+        identifier: identifier.trim(),
+        password,
+    })
+    return startSession(data)
 }
 
 export async function signup({ fullName, email, mobile, password }) {
-    await wait()
-
-    const normalizedEmail = email.trim().toLowerCase()
-    const emailTaken = registeredUsers.some(
-        (user) => user.email === normalizedEmail,
-    )
-
-    if (emailTaken) {
-        throw new Error('An account with this email already exists.')
-    }
-
-    const newUser = {
-        name: fullName.trim(),
-        username: normalizedEmail.split('@')[0],
-        email: normalizedEmail,
+    const { data } = await apiClient.post('/auth/signup', {
+        full_name: fullName,
+        email: email.trim(),
         mobile: mobile.trim(),
         password,
-    }
-    registeredUsers.push(newUser)
-
-    return toPublicUser(newUser)
+    })
+    return startSession(data)
 }
 
+export async function logout() {
+    try {
+        await apiClient.post('/auth/logout')
+    } finally {
+        useAuthStore.getState().clearSession()
+    }
+}
+
+// Password reset needs an email service, so it stays simulated for now.
 export async function requestPasswordReset() {
-    await wait()
+    await new Promise((resolve) => setTimeout(resolve, SIMULATED_DELAY_MS))
 }

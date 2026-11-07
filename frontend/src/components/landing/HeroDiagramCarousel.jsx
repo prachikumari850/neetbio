@@ -39,9 +39,13 @@ function HeroDiagramCarousel() {
                         type="button"
                         aria-pressed={label.id === activeLabelId}
                         onClick={() => setActiveLabelId(label.id)}
-                        style={{ top: label.top, left: label.left }}
+                        style={{
+                            top: label.top,
+                            '--label-left': label.left,
+                            '--label-left-mobile': label.mobileLeft ?? `calc(${label.left} - 12%)`,
+                        }}
                         className={cx(
-                            'rounded-pill shadow-card absolute flex -translate-y-1/2 items-center gap-2 bg-white px-3 py-1 text-xs font-bold',
+                            'rounded-pill shadow-card absolute left-[var(--label-left)] flex -translate-y-1/2 items-center gap-2 bg-white px-3 py-1 text-xs font-bold max-sm:left-[var(--label-left-mobile)] max-sm:gap-1 max-sm:px-1 max-sm:text-[9px]',
                             label.id === activeLabelId && 'ring-brand-purple ring-2',
                         )}
                     >
