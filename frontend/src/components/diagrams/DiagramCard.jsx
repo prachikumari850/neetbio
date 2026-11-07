@@ -2,7 +2,7 @@ import { Bookmark, Microscope } from 'lucide-react'
 import AssetImage from '@/components/common/AssetImage'
 import Badge from '@/components/common/Badge'
 import { cx } from '@/utils/classNames'
-import { getDiagramBadges } from '@/utils/diagramFilters'
+import { getDiagramBadges } from '@/utils/diagramBadges'
 
 function DiagramCard({ diagram, layout, isBookmarked, onToggleBookmark, onOpen }) {
     const isList = layout === 'list'

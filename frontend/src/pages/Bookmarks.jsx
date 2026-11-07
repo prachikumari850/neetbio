@@ -9,6 +9,7 @@ import Card from '@/components/common/Card'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import EmptyState from '@/components/common/EmptyState'
 import FeatureChecklist from '@/components/common/FeatureChecklist'
+import LoadingSpinner from '@/components/common/LoadingSpinner'
 import PageHeader from '@/components/common/PageHeader'
 import SelectField from '@/components/common/SelectField'
 import Tabs from '@/components/common/Tabs'
@@ -30,7 +31,7 @@ function Bookmarks() {
     const [sort, setSort] = useState('recent')
     const [isClearOpen, setIsClearOpen] = useState(false)
 
-    const { items, folders, removeItem, moveItem, addFolder, clearItems } = useBookmarkStore()
+    const { items, folders, status, load, remove, move, addFolder, clear } = useBookmarkStore()
 
     const query = searchParams.get('q') ?? ''
 
@@ -60,20 +61,80 @@ function Bookmarks() {
         )
         .sort(sorters[sort])
 
-    const handleRemove = (item) => {
-        removeItem(item.id)
-        toast.success('Removed from bookmarks')
+    const runAction = async (action, successMessage) => {
+        try {
+            await action()
+            toast.success(successMessage)
+        } catch (error) {
+            toast.error(error.message)
+        }
     }
 
-    const handleMove = (item, folder) => {
-        moveItem(item.id, folder)
-        toast.success(`Moved to ${folder}`)
-    }
+    const handleRemove = (item) => runAction(() => remove(item.id), 'Removed from bookmarks')
 
-    const handleClear = () => {
-        clearItems()
+    const handleMove = (item, folder) =>
+        runAction(() => move(item.id, folder), `Moved to ${folder}`)
+
+    const handleClear = async () => {
         setIsClearOpen(false)
-        toast.success('All bookmarks removed')
+        await runAction(clear, 'All bookmarks removed')
+    }
+
+    const renderItems = () => {
+        if (status === 'error') {
+            return (
+                <EmptyState
+                    icon={Bookmark}
+                    title="Couldn’t load your bookmarks"
+                    description="Check that the backend is running and try again."
+                >
+                    <Button variant="soft" onClick={load}>
+                        Try again
+                    </Button>
+                </EmptyState>
+            )
+        }
+
+        if (status !== 'ready') {
+            return <LoadingSpinner label="Loading bookmarks..." />
+        }
+
+        if (visibleItems.length === 0) {
+            const hasNoBookmarks = items.length === 0
+
+            return (
+                <EmptyState
+                    icon={Bookmark}
+                    title={hasNoBookmarks ? 'No bookmarks yet' : 'No bookmarks match'}
+                    description={
+                        hasNoBookmarks
+                            ? 'Save diagrams and questions to find them here.'
+                            : 'Try another folder, type or search term.'
+                    }
+                >
+                    {hasNoBookmarks && (
+                        <Button to="/diagrams" variant="soft">
+                            Explore Diagrams
+                        </Button>
+                    )}
+                </EmptyState>
+            )
+        }
+
+        return (
+            <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {visibleItems.map((item) => (
+                    <li key={item.id}>
+                        <BookmarkCard
+                            item={item}
+                            folders={folders}
+                            onRemove={handleRemove}
+                            onMove={handleMove}
+                        />
+                    </li>
+                ))}
+            </ul>
+        )
     }
 
     return (
@@ -139,36 +200,7 @@ function Bookmarks() {
                             </div>
                         </div>
 
-                        {visibleItems.length === 0 ? (
-                            <EmptyState
-                                icon={Bookmark}
-                                title={items.length === 0 ? 'No bookmarks yet' : 'No bookmarks match'}
-                                description={
-                                    items.length === 0
-                                        ? 'Save diagrams and questions to find them here.'
-                                        : 'Try another folder, type or search term.'
-                                }
-                            >
-                                {items.length === 0 && (
-                                    <Button to="/diagrams" variant="soft">
-                                        Explore Diagrams
-                                    </Button>
-                                )}
-                            </EmptyState>
-                        ) : (
-                            <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                                {visibleItems.map((item) => (
-                                    <li key={item.id}>
-                                        <BookmarkCard
-                                            item={item}
-                                            folders={folders}
-                                            onRemove={handleRemove}
-                                            onMove={handleMove}
-                                        />
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                        {renderItems()}
                     </Card>
                 </div>
             </div>

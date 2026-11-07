@@ -1,21 +1,25 @@
 import toast from 'react-hot-toast'
-import { BOOKMARK_LIMIT } from '@/data/mockBookmarks'
 import { useBookmarkStore } from '@/store/useBookmarkStore'
 
 export function useBookmarkToggle() {
     const items = useBookmarkStore((state) => state.items)
-    const toggleItem = useBookmarkStore((state) => state.toggleItem)
+    const add = useBookmarkStore((state) => state.add)
+    const remove = useBookmarkStore((state) => state.remove)
 
     const isBookmarked = (id) => items.some((item) => item.id === id)
 
-    const toggle = (item) => {
-        if (!isBookmarked(item.id) && items.length >= BOOKMARK_LIMIT) {
-            toast.error(`Bookmark limit reached (${BOOKMARK_LIMIT}). Remove one to save more.`)
-            return
+    const toggle = async (item) => {
+        try {
+            if (isBookmarked(item.id)) {
+                await remove(item.id)
+                toast.success('Removed from bookmarks')
+            } else {
+                await add(item)
+                toast.success('Saved to bookmarks')
+            }
+        } catch (error) {
+            toast.error(error.message)
         }
-
-        const wasAdded = toggleItem(item)
-        toast.success(wasAdded ? 'Saved to bookmarks' : 'Removed from bookmarks')
     }
 
     return { isBookmarked, toggle }

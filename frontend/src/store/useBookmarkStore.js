@@ -1,33 +1,53 @@
 import { create } from 'zustand'
-import { defaultFolders, initialBookmarks } from '@/data/mockBookmarks'
+import {
+    clearBookmarks,
+    createBookmark,
+    createFolder,
+    deleteBookmark,
+    fetchBookmarks,
+    moveBookmark,
+} from '@/services/bookmarkService'
 
-export const useBookmarkStore = create((set, get) => ({
-    items: initialBookmarks,
-    folders: defaultFolders,
+export const useBookmarkStore = create((set) => ({
+    items: [],
+    folders: [],
+    status: 'idle',
 
-    toggleItem: (item) => {
-        const exists = get().items.some((current) => current.id === item.id)
+    load: async () => {
+        set({ status: 'loading' })
 
-        set((state) => ({
-            items: exists
-                ? state.items.filter((current) => current.id !== item.id)
-                : [{ ...item, savedAt: new Date().toISOString() }, ...state.items],
-        }))
-
-        return !exists
+        try {
+            const { items, folders } = await fetchBookmarks()
+            set({ items, folders, status: 'ready' })
+        } catch {
+            set({ status: 'error' })
+        }
     },
 
-    removeItem: (id) =>
-        set((state) => ({ items: state.items.filter((item) => item.id !== id) })),
+    add: async (item) => {
+        const saved = await createBookmark(item)
+        set((state) => ({ items: [saved, ...state.items] }))
+    },
 
-    moveItem: (id, folder) =>
+    remove: async (itemId) => {
+        await deleteBookmark(itemId)
+        set((state) => ({ items: state.items.filter((item) => item.id !== itemId) }))
+    },
+
+    move: async (itemId, folder) => {
+        const updated = await moveBookmark(itemId, folder)
         set((state) => ({
-            items: state.items.map((item) =>
-                item.id === id ? { ...item, folder } : item,
-            ),
-        })),
+            items: state.items.map((item) => (item.id === itemId ? updated : item)),
+        }))
+    },
 
-    addFolder: (name) => set((state) => ({ folders: [...state.folders, name] })),
+    addFolder: async (name) => {
+        const folders = await createFolder(name)
+        set({ folders })
+    },
 
-    clearItems: () => set({ items: [] }),
+    clear: async () => {
+        await clearBookmarks()
+        set({ items: [] })
+    },
 }))

@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, Heart, Microscope, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import AssetImage from '@/components/common/AssetImage'
 import Badge from '@/components/common/Badge'
+import LoadingSpinner from '@/components/common/LoadingSpinner'
 import SectionCard from '@/components/common/SectionCard'
 import { recommendedDiagramIds } from '@/data/mockDashboard'
-import { diagrams } from '@/data/mockDiagrams'
 import { useBookmarkToggle } from '@/hooks/useBookmarkToggle'
+import { listDiagrams } from '@/services/diagramService'
 import { cx } from '@/utils/classNames'
 import { diagramToBookmark } from '@/utils/bookmarkItems'
 
@@ -15,30 +16,22 @@ const PAGE_SIZE = 4
 const arrowClasses =
     'border-line shadow-card hover:bg-brand-purple-soft flex size-9 shrink-0 items-center justify-center rounded-full border bg-white'
 
-const recommendedDiagrams = recommendedDiagramIds
-    .map((id) => diagrams.find((diagram) => diagram.id === id))
-    .filter(Boolean)
+function orderByRecommendation(diagrams) {
+    return [...diagrams].sort(
+        (a, b) => recommendedDiagramIds.indexOf(a.id) - recommendedDiagramIds.indexOf(b.id),
+    )
+}
 
-const pageCount = Math.ceil(recommendedDiagrams.length / PAGE_SIZE)
-
-function RecommendedCarousel({ className }) {
+function DiagramPager({ diagrams }) {
     const [page, setPage] = useState(0)
     const { isBookmarked, toggle } = useBookmarkToggle()
 
+    const pageCount = Math.ceil(diagrams.length / PAGE_SIZE)
     const goToPage = (nextPage) => setPage((nextPage + pageCount) % pageCount)
-    const visibleDiagrams = recommendedDiagrams.slice(
-        page * PAGE_SIZE,
-        (page + 1) * PAGE_SIZE,
-    )
+    const visibleDiagrams = diagrams.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
 
     return (
-        <SectionCard
-            icon={Star}
-            title="Recommended for You"
-            iconClassName="fill-brand-orange text-brand-orange"
-            action={{ label: 'View All', to: '/diagrams' }}
-            className={className}
-        >
+        <>
             <div className="flex items-center gap-2">
                 <button
                     type="button"
@@ -116,6 +109,58 @@ function RecommendedCarousel({ className }) {
                     />
                 ))}
             </div>
+        </>
+    )
+}
+
+function RecommendedCarousel({ className }) {
+    const [diagrams, setDiagrams] = useState(null)
+
+    useEffect(() => {
+        let isCancelled = false
+
+        listDiagrams({ ids: recommendedDiagramIds, pageSize: recommendedDiagramIds.length })
+            .then(({ items }) => {
+                if (!isCancelled) {
+                    setDiagrams(orderByRecommendation(items))
+                }
+            })
+            .catch(() => {
+                if (!isCancelled) {
+                    setDiagrams([])
+                }
+            })
+
+        return () => {
+            isCancelled = true
+        }
+    }, [])
+
+    const renderBody = () => {
+        if (diagrams === null) {
+            return <LoadingSpinner label="Loading recommendations..." />
+        }
+
+        if (diagrams.length === 0) {
+            return (
+                <p className="text-ink-500 py-6 text-center text-sm">
+                    Recommendations are unavailable right now.
+                </p>
+            )
+        }
+
+        return <DiagramPager diagrams={diagrams} />
+    }
+
+    return (
+        <SectionCard
+            icon={Star}
+            title="Recommended for You"
+            iconClassName="fill-brand-orange text-brand-orange"
+            action={{ label: 'View All', to: '/diagrams' }}
+            className={className}
+        >
+            {renderBody()}
         </SectionCard>
     )
 }

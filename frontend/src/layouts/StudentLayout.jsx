@@ -1,13 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from '@/components/layout/Sidebar'
 import Topbar from '@/components/layout/Topbar'
 import { findNavigationItem } from '@/data/navigation'
+import { useBookmarkStore } from '@/store/useBookmarkStore'
 
 function StudentLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const { pathname } = useLocation()
     const activeItem = findNavigationItem(pathname)
+    const loadBookmarks = useBookmarkStore((state) => state.load)
+
+    useEffect(() => {
+        loadBookmarks()
+    }, [loadBookmarks])
 
     return (
         <div className="bg-page-gradient min-h-screen">

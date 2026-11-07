@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { ArrowUpDown, BookOpen, Layers, LayoutGrid, List, Search, X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import Button from '@/components/common/Button'
 import EmptyState from '@/components/common/EmptyState'
 import FeatureChecklist from '@/components/common/FeatureChecklist'
+import LoadingSpinner from '@/components/common/LoadingSpinner'
+import Modal from '@/components/common/Modal'
 import PageHeader from '@/components/common/PageHeader'
 import Pagination from '@/components/common/Pagination'
 import SelectField from '@/components/common/SelectField'
@@ -11,11 +13,13 @@ import Tabs from '@/components/common/Tabs'
 import DiagramCard from '@/components/diagrams/DiagramCard'
 import DiagramFilters from '@/components/diagrams/DiagramFilters'
 import DiagramViewer from '@/components/diagrams/DiagramViewer'
-import { diagramSortOptions, diagrams } from '@/data/mockDiagrams'
+import { diagramSortOptions } from '@/data/diagramOptions'
 import { useBookmarkToggle } from '@/hooks/useBookmarkToggle'
+import { useDiagram } from '@/hooks/useDiagram'
+import { useDiagramFacets } from '@/hooks/useDiagramFacets'
+import { useDiagramSearch } from '@/hooks/useDiagramSearch'
 import { cx } from '@/utils/classNames'
 import { diagramToBookmark } from '@/utils/bookmarkItems'
-import { filterDiagrams, sortDiagrams } from '@/utils/diagramFilters'
 
 const PAGE_SIZE = 8
 
@@ -43,17 +47,38 @@ function toOptions(allLabel, values) {
     ]
 }
 
+function matchesClass(item, classLevel) {
+    return classLevel === 'all' || item.classLevel === classLevel
+}
+
 function ExploreDiagrams() {
     const [searchParams, setSearchParams] = useSearchParams()
     const [filters, setFilters] = useState(initialFilters)
-    const [page, setPage] = useState(1)
+    const [pageState, setPageState] = useState({ query: '', page: 1 })
     const [layout, setLayout] = useState('grid')
     const { isBookmarked, toggle } = useBookmarkToggle()
+    const facets = useDiagramFacets()
 
     const query = searchParams.get('q') ?? ''
     const isSearching = query.trim() !== ''
     const effectiveClassLevel = isSearching ? 'all' : filters.classLevel
-    const openDiagram = diagrams.find((item) => item.id === searchParams.get('open'))
+    const openId = searchParams.get('open')
+    const { diagram: openDiagram, isLoading: isOpening } = useDiagram(openId)
+
+    const page = pageState.query === query ? pageState.page : 1
+    const setPage = (nextPage) => setPageState({ query, page: nextPage })
+
+    const { items, total, totalPages, isLoading, error, retry } = useDiagramSearch({
+        query,
+        classLevel: effectiveClassLevel,
+        chapter: filters.chapter,
+        topic: filters.topic,
+        types: filters.types,
+        features: filters.features,
+        sort: filters.sort,
+        page,
+        pageSize: PAGE_SIZE,
+    })
 
     const updateParam = (key, value) => {
         setSearchParams((previous) => {
@@ -92,30 +117,75 @@ function ExploreDiagrams() {
         updateParam('q', '')
     }
 
-    const classScoped = diagrams.filter(
-        (diagram) => effectiveClassLevel === 'all' || diagram.classLevel === effectiveClassLevel,
-    )
-    const chapters = [...new Set(classScoped.map((diagram) => diagram.chapter))]
+    const chapters = facets.chapters
+        .filter((chapter) => matchesClass(chapter, effectiveClassLevel))
+        .map((chapter) => chapter.name)
     const topics = [
         ...new Set(
-            classScoped
-                .filter((diagram) => filters.chapter === 'all' || diagram.chapter === filters.chapter)
-                .map((diagram) => diagram.topic),
+            facets.topics
+                .filter(
+                    (topic) =>
+                        matchesClass(topic, effectiveClassLevel) &&
+                        (filters.chapter === 'all' || topic.chapter === filters.chapter),
+                )
+                .map((topic) => topic.name),
         ),
     ]
 
-    const results = useMemo(
-        () =>
-            sortDiagrams(
-                filterDiagrams(diagrams, { ...filters, classLevel: effectiveClassLevel, query }),
-                filters.sort,
-            ),
-        [filters, effectiveClassLevel, query],
-    )
+    const renderResults = () => {
+        if (error) {
+            return (
+                <EmptyState icon={Search} title="Couldn’t load diagrams" description={error}>
+                    <Button variant="soft" onClick={retry}>
+                        Try again
+                    </Button>
+                </EmptyState>
+            )
+        }
 
-    const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE))
-    const currentPage = Math.min(page, totalPages)
-    const visibleDiagrams = results.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+        if (isLoading && items.length === 0) {
+            return <LoadingSpinner label="Loading diagrams..." />
+        }
+
+        if (items.length === 0) {
+            return (
+                <EmptyState
+                    icon={Search}
+                    title="No diagrams match your filters"
+                    description="Try a different search term or reset the filters."
+                >
+                    <Button variant="soft" onClick={resetFilters}>
+                        Reset Filters
+                    </Button>
+                </EmptyState>
+            )
+        }
+
+        return (
+            <ul
+                aria-busy={isLoading}
+                className={cx(
+                    'grid gap-4',
+                    layout === 'grid' ? 'sm:grid-cols-2 xl:grid-cols-4' : 'grid-cols-1',
+                    isLoading && 'opacity-60',
+                )}
+            >
+                {items.map((diagram) => (
+                    <li key={diagram.id}>
+                        <DiagramCard
+                            diagram={diagram}
+                            layout={layout}
+                            isBookmarked={isBookmarked(`diagram-${diagram.id}`)}
+                            onToggleBookmark={(item) => toggle(diagramToBookmark(item))}
+                            onOpen={(id) => updateParam('open', id)}
+                        />
+                    </li>
+                ))}
+            </ul>
+        )
+    }
+
+    const isResultsCardVisible = error || items.length === 0
 
     return (
         <>
@@ -162,13 +232,18 @@ function ExploreDiagrams() {
                 </div>
 
                 <div className="grid gap-5 lg:grid-cols-[16rem_1fr]">
-                    <DiagramFilters filters={filters} onToggle={toggleFilterValue} onReset={resetFilters} />
+                    <DiagramFilters
+                        filters={filters}
+                        facets={facets}
+                        onToggle={toggleFilterValue}
+                        onReset={resetFilters}
+                    />
 
                     <section className="space-y-4">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <h2 className="flex items-center gap-2 text-xl font-extrabold">
                                 <BookOpen className="text-brand-orange size-6" />
-                                {results.length} Diagrams Found
+                                {total} Diagrams Found
                             </h2>
 
                             {isSearching && (
@@ -204,40 +279,15 @@ function ExploreDiagrams() {
                             </div>
                         </div>
 
-                        {visibleDiagrams.length === 0 ? (
+                        {isResultsCardVisible ? (
                             <div className="rounded-card border-line shadow-card border bg-white">
-                                <EmptyState
-                                    icon={Search}
-                                    title="No diagrams match your filters"
-                                    description="Try a different search term or reset the filters."
-                                >
-                                    <Button variant="soft" onClick={resetFilters}>
-                                        Reset Filters
-                                    </Button>
-                                </EmptyState>
+                                {renderResults()}
                             </div>
                         ) : (
-                            <ul
-                                className={cx(
-                                    'grid gap-4',
-                                    layout === 'grid' ? 'sm:grid-cols-2 xl:grid-cols-4' : 'grid-cols-1',
-                                )}
-                            >
-                                {visibleDiagrams.map((diagram) => (
-                                    <li key={diagram.id}>
-                                        <DiagramCard
-                                            diagram={diagram}
-                                            layout={layout}
-                                            isBookmarked={isBookmarked(`diagram-${diagram.id}`)}
-                                            onToggleBookmark={(item) => toggle(diagramToBookmark(item))}
-                                            onOpen={(id) => updateParam('open', id)}
-                                        />
-                                    </li>
-                                ))}
-                            </ul>
+                            renderResults()
                         )}
 
-                        <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setPage} />
+                        <Pagination currentPage={page} totalPages={totalPages} onChange={setPage} />
                     </section>
                 </div>
             </div>
@@ -248,6 +298,14 @@ function ExploreDiagrams() {
                     diagram={openDiagram}
                     onClose={() => updateParam('open', '')}
                 />
+            )}
+
+            {openId && !isOpening && !openDiagram && (
+                <Modal isOpen title="Diagram not found" onClose={() => updateParam('open', '')}>
+                    <p className="text-ink-700 text-sm">
+                        This diagram doesn’t exist or couldn’t be loaded right now.
+                    </p>
+                </Modal>
             )}
         </>
     )

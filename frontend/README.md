@@ -7,6 +7,10 @@ cd backend
 .venv\Scripts\Activate.ps1
 uvicorn app.main:app --reload
 
+# To seed database
+cd backend
+python -m app.database.seed
+
 # Terminal 2 – from neetbio/frontend
 cd frontend
 npm run dev

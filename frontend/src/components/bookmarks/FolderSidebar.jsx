@@ -10,11 +10,12 @@ import { cx } from '@/utils/classNames'
 
 const ALL_FOLDERS = 'all'
 
-function NewFolderForm({ existingFolders, onCreate, onClose }) {
+function NewFolderForm({ onCreate, onClose }) {
     const [name, setName] = useState('')
     const [error, setError] = useState('')
+    const [isSaving, setIsSaving] = useState(false)
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
         const trimmedName = name.trim()
 
@@ -23,14 +24,16 @@ function NewFolderForm({ existingFolders, onCreate, onClose }) {
             return
         }
 
-        if (existingFolders.some((folder) => folder.toLowerCase() === trimmedName.toLowerCase())) {
-            setError('A folder with this name already exists.')
-            return
-        }
+        setIsSaving(true)
 
-        onCreate(trimmedName)
-        toast.success(`Folder “${trimmedName}” created`)
-        onClose()
+        try {
+            await onCreate(trimmedName)
+            toast.success(`Folder “${trimmedName}” created`)
+            onClose()
+        } catch (createError) {
+            setError(createError.message)
+            setIsSaving(false)
+        }
     }
 
     return (
@@ -55,8 +58,8 @@ function NewFolderForm({ existingFolders, onCreate, onClose }) {
                     </p>
                 )}
             </div>
-            <Button type="submit" className="w-full">
-                Create Folder
+            <Button type="submit" className="w-full" disabled={isSaving}>
+                {isSaving ? 'Creating...' : 'Create Folder'}
             </Button>
         </form>
     )
@@ -135,11 +138,7 @@ function FolderSidebar({ folders, items, activeFolder, onSelect, onCreate }) {
             </Card>
 
             <Modal isOpen={isModalOpen} title="New folder" onClose={() => setIsModalOpen(false)}>
-                <NewFolderForm
-                    existingFolders={folders}
-                    onCreate={onCreate}
-                    onClose={() => setIsModalOpen(false)}
-                />
+                <NewFolderForm onCreate={onCreate} onClose={() => setIsModalOpen(false)} />
             </Modal>
         </aside>
     )

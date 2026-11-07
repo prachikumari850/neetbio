@@ -1,7 +1,7 @@
 import { ListFilter, RotateCcw } from 'lucide-react'
-import Card from '@/components/common/Card'
 import Button from '@/components/common/Button'
-import { diagramFeatures, diagramTypes, diagrams } from '@/data/mockDiagrams'
+import Card from '@/components/common/Card'
+import { diagramFeatures, diagramTypes } from '@/data/diagramOptions'
 
 function CheckboxRow({ label, count, icon: Icon, checked, onChange }) {
     return (
@@ -19,7 +19,7 @@ function CheckboxRow({ label, count, icon: Icon, checked, onChange }) {
     )
 }
 
-function DiagramFilters({ filters, onToggle, onReset }) {
+function DiagramFilters({ filters, facets, onToggle, onReset }) {
     return (
         <Card as="aside" className="space-y-4 p-5">
             <h2 className="flex items-center gap-2 text-lg font-extrabold">
@@ -34,7 +34,7 @@ function DiagramFilters({ filters, onToggle, onReset }) {
                     <CheckboxRow
                         key={id}
                         label={label}
-                        count={diagrams.filter((diagram) => diagram.type === id).length}
+                        count={facets.types[id] ?? 0}
                         checked={filters.types.includes(id)}
                         onChange={() => onToggle('types', id)}
                     />
@@ -49,7 +49,7 @@ function DiagramFilters({ filters, onToggle, onReset }) {
                         key={id}
                         label={label}
                         icon={icon}
-                        count={diagrams.filter((diagram) => diagram.features.includes(id)).length}
+                        count={facets.features[id] ?? 0}
                         checked={filters.features.includes(id)}
                         onChange={() => onToggle('features', id)}
                     />

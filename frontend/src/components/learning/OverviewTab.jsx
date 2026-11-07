@@ -12,11 +12,10 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import AssetImage from '@/components/common/AssetImage'
-import Button from '@/components/common/Button'
+import ContinueLearningPanel from '@/components/common/ContinueLearningPanel'
 import ProgressBar from '@/components/common/ProgressBar'
 import ProgressRing from '@/components/common/ProgressRing'
 import SectionCard from '@/components/common/SectionCard'
-import { diagrams } from '@/data/mockDiagrams'
 import {
     achievements,
     continueItem,
@@ -30,7 +29,6 @@ import { formatShortDate } from '@/utils/formatters'
 
 function OverviewTab({ notes, onTabChange }) {
     const bookmarks = useBookmarkStore((state) => state.items)
-    const continueDiagram = diagrams.find((item) => item.id === continueItem.diagramId)
     const savedDiagrams = bookmarks.filter((item) => item.type === 'diagram').slice(0, 3)
 
     return (
@@ -42,28 +40,13 @@ function OverviewTab({ notes, onTabChange }) {
                     iconClassName="fill-brand-orange text-brand-orange"
                     className="bg-linear-to-b from-[#eefbe9] to-white"
                 >
-                    <div className="border-line flex items-center gap-4 rounded-2xl border bg-white/80 p-4">
-                        <span className="flex h-24 w-24 shrink-0 items-center justify-center">
-                            <AssetImage
-                                src={continueDiagram.image}
-                                alt=""
-                                className="max-h-full object-contain"
-                                fallback={<Microscope className="text-brand-purple/40 size-12" />}
-                            />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                            <h3 className="leading-tight font-extrabold">{continueItem.title}</h3>
-                            <p className="text-info text-xs">{continueItem.meta}</p>
-                            <ProgressBar value={continueItem.progress} className="mt-3" />
-                            <p className="text-ink-700 mt-1 text-right text-xs font-semibold">
-                                {continueItem.progress}% Completed
-                            </p>
-                            <Button to={`/diagrams?open=${continueDiagram.id}`} size="sm">
-                                <Play className="size-4 fill-white" />
-                                Continue
-                            </Button>
-                        </div>
-                    </div>
+                    <ContinueLearningPanel
+                        diagramId={continueItem.diagramId}
+                        title={continueItem.title}
+                        meta={continueItem.meta}
+                        metaClassName="text-info"
+                        progress={continueItem.progress}
+                    />
                 </SectionCard>
 
                 <SectionCard
@@ -79,7 +62,7 @@ function OverviewTab({ notes, onTabChange }) {
                                     className="hover:bg-page flex items-center gap-3 rounded-lg px-1 py-1.5"
                                 >
                                     <Icon className={cx('size-6 shrink-0', tone)} />
-                                    <span className="min-w-0 flex-1 text-sm font-bold">{label}</span>
+                                    <span className="w-36 shrink-0 text-sm font-bold">{label}</span>
                                     <ProgressBar value={value} className="flex-1" />
                                     <span className="w-10 text-right text-sm font-bold">{value}%</span>
                                     <ChevronRight className="size-4 shrink-0" />
