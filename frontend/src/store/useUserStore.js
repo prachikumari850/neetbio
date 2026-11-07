@@ -8,7 +8,6 @@ const guestUser = {
     mobile: '',
     joinedAt: null,
     avatar: '/images/avatar.png',
-    streak: 12,
 }
 
 export const useUserStore = create((set) => ({

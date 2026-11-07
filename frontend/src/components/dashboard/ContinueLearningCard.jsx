@@ -1,7 +1,7 @@
 import { Play } from 'lucide-react'
 import ContinueLearningPanel from '@/components/common/ContinueLearningPanel'
 import SectionCard from '@/components/common/SectionCard'
-import { continueLearning } from '@/data/mockDashboard'
+import SummaryGate from '@/components/common/SummaryGate'
 import { cx } from '@/utils/classNames'
 
 function ContinueLearningCard({ className }) {
@@ -12,12 +12,9 @@ function ContinueLearningCard({ className }) {
             iconClassName="fill-brand-orange text-brand-orange"
             className={cx('bg-linear-to-b from-[#eefbe9] to-white', className)}
         >
-            <ContinueLearningPanel
-                diagramId={continueLearning.diagramId}
-                title={continueLearning.title}
-                meta={continueLearning.chapter}
-                progress={continueLearning.progress}
-            />
+            <SummaryGate>
+                {(summary) => <ContinueLearningPanel item={summary.continueItem} />}
+            </SummaryGate>
         </SectionCard>
     )
 }

@@ -18,6 +18,7 @@ import { useBookmarkToggle } from '@/hooks/useBookmarkToggle'
 import { useDiagram } from '@/hooks/useDiagram'
 import { useDiagramFacets } from '@/hooks/useDiagramFacets'
 import { useDiagramSearch } from '@/hooks/useDiagramSearch'
+import { useRecordDiagramView } from '@/hooks/useRecordDiagramView'
 import { cx } from '@/utils/classNames'
 import { diagramToBookmark } from '@/utils/bookmarkItems'
 
@@ -64,6 +65,7 @@ function ExploreDiagrams() {
     const effectiveClassLevel = isSearching ? 'all' : filters.classLevel
     const openId = searchParams.get('open')
     const { diagram: openDiagram, isLoading: isOpening } = useDiagram(openId)
+    useRecordDiagramView(openDiagram?.id)
 
     const page = pageState.query === query ? pageState.page : 1
     const setPage = (nextPage) => setPageState({ query, page: nextPage })

@@ -15,6 +15,14 @@ HIDDEN_FROM_STUDENTS = {
     "content_hash": 0,
     "imported_at": 0,
 }
+ANALYTICS_FIELDS = {
+    "subject": 1,
+    "unit": 1,
+    "chapter": 1,
+    "topic": 1,
+    "correct_index": 1,
+    "review.status": 1,
+}
 
 
 def _questions():
@@ -42,6 +50,11 @@ async def upsert_many(documents: list[dict]) -> None:
 async def find_by_ids(ids: list[str], with_answers: bool = False) -> list[dict]:
     projection = None if with_answers else HIDDEN_FROM_STUDENTS
     return await _questions().find({"_id": {"$in": ids}}, projection).to_list()
+
+
+async def list_for_analytics(ids: list[str]) -> list[dict]:
+    mongo_filter = {"$or": [REVIEWED, {"_id": {"$in": ids}}]}
+    return await _questions().find(mongo_filter, ANALYTICS_FIELDS).to_list()
 
 
 async def list_texts() -> list[dict]:

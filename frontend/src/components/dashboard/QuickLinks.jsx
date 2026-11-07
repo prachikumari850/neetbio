@@ -1,12 +1,12 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { quickLinks } from '@/data/mockDashboard'
+import { dashboardLinks } from '@/data/learningConfig'
 import { cx } from '@/utils/classNames'
 
 function QuickLinks() {
     return (
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {quickLinks.map(({ id, title, subtitle, to, icon: Icon, tint, iconTone }) => (
+            {dashboardLinks.map(({ id, title, subtitle, to, icon: Icon, tint, iconTone }) => (
                 <li key={id}>
                     <Link
                         to={to}

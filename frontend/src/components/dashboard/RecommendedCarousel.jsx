@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Heart, Microscope, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import AssetImage from '@/components/common/AssetImage'
 import Badge from '@/components/common/Badge'
-import LoadingSpinner from '@/components/common/LoadingSpinner'
 import SectionCard from '@/components/common/SectionCard'
-import { recommendedDiagramIds } from '@/data/mockDashboard'
+import SummaryGate from '@/components/common/SummaryGate'
 import { useBookmarkToggle } from '@/hooks/useBookmarkToggle'
-import { listDiagrams } from '@/services/diagramService'
 import { cx } from '@/utils/classNames'
 import { diagramToBookmark } from '@/utils/bookmarkItems'
 
@@ -15,12 +13,6 @@ const PAGE_SIZE = 4
 
 const arrowClasses =
     'border-line shadow-card hover:bg-brand-purple-soft flex size-9 shrink-0 items-center justify-center rounded-full border bg-white'
-
-function orderByRecommendation(diagrams) {
-    return [...diagrams].sort(
-        (a, b) => recommendedDiagramIds.indexOf(a.id) - recommendedDiagramIds.indexOf(b.id),
-    )
-}
 
 function DiagramPager({ diagrams }) {
     const [page, setPage] = useState(0)
@@ -50,6 +42,7 @@ function DiagramPager({ diagrams }) {
                             <li key={diagram.id} className="relative">
                                 <Link
                                     to={`/diagrams?open=${diagram.id}`}
+                                    title={diagram.reason}
                                     className="border-line flex h-full flex-col items-center gap-2 rounded-2xl border bg-white p-3 text-center"
                                 >
                                     <span className="flex h-20 items-center justify-center">
@@ -64,6 +57,7 @@ function DiagramPager({ diagrams }) {
                                     <Badge className="max-w-full truncate text-[10px]">
                                         {diagram.chapter.split(':')[0]}
                                     </Badge>
+                                    <span className="text-ink-500 text-[11px] leading-tight">{diagram.reason}</span>
                                 </Link>
                                 <button
                                     type="button"
@@ -114,44 +108,6 @@ function DiagramPager({ diagrams }) {
 }
 
 function RecommendedCarousel({ className }) {
-    const [diagrams, setDiagrams] = useState(null)
-
-    useEffect(() => {
-        let isCancelled = false
-
-        listDiagrams({ ids: recommendedDiagramIds, pageSize: recommendedDiagramIds.length })
-            .then(({ items }) => {
-                if (!isCancelled) {
-                    setDiagrams(orderByRecommendation(items))
-                }
-            })
-            .catch(() => {
-                if (!isCancelled) {
-                    setDiagrams([])
-                }
-            })
-
-        return () => {
-            isCancelled = true
-        }
-    }, [])
-
-    const renderBody = () => {
-        if (diagrams === null) {
-            return <LoadingSpinner label="Loading recommendations..." />
-        }
-
-        if (diagrams.length === 0) {
-            return (
-                <p className="text-ink-500 py-6 text-center text-sm">
-                    Recommendations are unavailable right now.
-                </p>
-            )
-        }
-
-        return <DiagramPager diagrams={diagrams} />
-    }
-
     return (
         <SectionCard
             icon={Star}
@@ -160,7 +116,17 @@ function RecommendedCarousel({ className }) {
             action={{ label: 'View All', to: '/diagrams' }}
             className={className}
         >
-            {renderBody()}
+            <SummaryGate>
+                {({ recommendations }) =>
+                    recommendations.diagrams.length === 0 ? (
+                        <p className="text-ink-500 py-6 text-center text-sm">
+                            No recommendations yet. Explore a few diagrams and take a test.
+                        </p>
+                    ) : (
+                        <DiagramPager diagrams={recommendations.diagrams} />
+                    )
+                }
+            </SummaryGate>
         </SectionCard>
     )
 }

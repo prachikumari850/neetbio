@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import ContinueLearningCard from '@/components/dashboard/ContinueLearningCard'
 import DailyGoalCard from '@/components/dashboard/DailyGoalCard'
 import LearningProgressCard from '@/components/dashboard/LearningProgressCard'
@@ -6,8 +7,15 @@ import RecentActivityCard from '@/components/dashboard/RecentActivityCard'
 import RecommendedCarousel from '@/components/dashboard/RecommendedCarousel'
 import UpcomingPracticeCard from '@/components/dashboard/UpcomingPracticeCard'
 import WelcomeBanner from '@/components/dashboard/WelcomeBanner'
+import { useLearningStore } from '@/store/useLearningStore'
 
 function Dashboard() {
+    const loadSummary = useLearningStore((state) => state.load)
+
+    useEffect(() => {
+        loadSummary()
+    }, [loadSummary])
+
     return (
         <>
             <WelcomeBanner />

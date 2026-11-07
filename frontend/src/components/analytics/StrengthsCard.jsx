@@ -1,8 +1,8 @@
 import { CircleAlert, CircleCheck, Target, Trophy } from 'lucide-react'
 import SectionCard from '@/components/common/SectionCard'
-import { strengths, weaknesses } from '@/data/mockAnalytics'
+import { formatAccuracy } from '@/utils/analyticsFormat'
 
-function StrengthsCard({ className }) {
+function StrengthsCard({ strengths, weaknesses, minSample, className }) {
     return (
         <SectionCard
             icon={Trophy}
@@ -16,14 +16,21 @@ function StrengthsCard({ className }) {
                         Your Strengths
                         <CircleCheck className="fill-success size-5 text-white" />
                     </h3>
-                    <ul className="space-y-2 text-sm font-medium">
-                        {strengths.map((topic) => (
-                            <li key={topic} className="flex items-center gap-2">
-                                <CircleCheck className="fill-success size-5 shrink-0 text-white" />
-                                {topic}
-                            </li>
-                        ))}
-                    </ul>
+                    {strengths.length === 0 ? (
+                        <p className="text-ink-700 text-xs">
+                            Answer at least {minSample} questions in a chapter with 75% accuracy or better.
+                        </p>
+                    ) : (
+                        <ul className="space-y-2 text-sm font-medium">
+                            {strengths.map(({ name, accuracy }) => (
+                                <li key={name} className="flex items-center gap-2">
+                                    <CircleCheck className="fill-success size-5 shrink-0 text-white" />
+                                    <span className="flex-1">{name}</span>
+                                    <span className="text-xs font-bold">{formatAccuracy(accuracy)}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
 
                 <div className="bg-danger-soft rounded-2xl p-4">
@@ -31,14 +38,21 @@ function StrengthsCard({ className }) {
                         Areas to Improve
                         <CircleAlert className="text-danger size-5" />
                     </h3>
-                    <ul className="space-y-2 text-sm font-medium">
-                        {weaknesses.map((topic) => (
-                            <li key={topic} className="flex items-center gap-2">
-                                <Target className="text-danger size-5 shrink-0" />
-                                {topic}
-                            </li>
-                        ))}
-                    </ul>
+                    {weaknesses.length === 0 ? (
+                        <p className="text-ink-700 text-xs">
+                            Chapters with {minSample}+ answers and accuracy below 60% appear here.
+                        </p>
+                    ) : (
+                        <ul className="space-y-2 text-sm font-medium">
+                            {weaknesses.map(({ name, accuracy }) => (
+                                <li key={name} className="flex items-center gap-2">
+                                    <Target className="text-danger size-5 shrink-0" />
+                                    <span className="flex-1">{name}</span>
+                                    <span className="text-xs font-bold">{formatAccuracy(accuracy)}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
             </div>
         </SectionCard>

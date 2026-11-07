@@ -37,6 +37,10 @@ function parseStartParam(value) {
         return { mode: 'area', area: value.slice(5) }
     }
 
+    if (value?.startsWith('chapter-')) {
+        return { mode: 'chapter', chapter: value.slice('chapter-'.length) }
+    }
+
     return null
 }
 

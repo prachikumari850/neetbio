@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import SearchInput from '@/components/common/SearchInput'
 import NotificationMenu from '@/components/layout/NotificationMenu'
 import UserMenu from '@/components/layout/UserMenu'
-import { useUserStore } from '@/store/useUserStore'
+import { useLearningStore } from '@/store/useLearningStore'
 
 function Topbar({ activeItem, onMenuClick }) {
     const [query, setQuery] = useState('')
     const searchInputRef = useRef(null)
     const navigate = useNavigate()
-    const streak = useUserStore((state) => state.user.streak)
+    const streak = useLearningStore((state) => state.summary?.streak.current ?? 0)
 
     useEffect(() => {
         const handleKeyDown = (event) => {

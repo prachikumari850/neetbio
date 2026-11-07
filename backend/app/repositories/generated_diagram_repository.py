@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from bson import ObjectId
 
 from app.database.mongodb import get_database
@@ -38,3 +40,10 @@ async def insert(document: dict) -> None:
 async def delete(user_id: ObjectId, diagram_id: ObjectId) -> bool:
     result = await _diagrams().delete_one({"_id": diagram_id, "user_id": user_id})
     return result.deleted_count == 1
+
+
+async def created_times(user_id: ObjectId, since: datetime) -> list[datetime]:
+    cursor = _diagrams().find(
+        {"user_id": user_id, "created_at": {"$gte": since}}, {"created_at": 1}
+    )
+    return [item["created_at"] for item in await cursor.to_list()]

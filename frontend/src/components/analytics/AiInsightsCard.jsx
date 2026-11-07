@@ -1,12 +1,11 @@
 import { CircleCheck, Sparkles } from 'lucide-react'
 import SectionCard from '@/components/common/SectionCard'
-import { aiInsights } from '@/data/mockAnalytics'
 
-function AiInsightsCard({ className }) {
+function AiInsightsCard({ insights, className }) {
     return (
         <SectionCard icon={Sparkles} title="AI Insights" className={className}>
             <ul className="space-y-3">
-                {aiInsights.map((insight) => (
+                {insights.map((insight) => (
                     <li key={insight} className="flex items-start gap-2 text-sm font-medium">
                         <CircleCheck className="fill-success mt-0.5 size-5 shrink-0 text-white" />
                         {insight}
@@ -14,7 +13,7 @@ function AiInsightsCard({ className }) {
                 ))}
             </ul>
             <p className="text-ink-500 mt-3 text-xs">
-                Sample insights. Personalised AI insights arrive with the backend.
+                Worked out from your own results with fixed rules, not written by an AI model.
             </p>
         </SectionCard>
     )

@@ -53,3 +53,14 @@ async def delete(user_id: ObjectId, conversation_id: ObjectId) -> bool:
         {"_id": conversation_id, "user_id": user_id}
     )
     return result.deleted_count == 1
+
+
+async def user_message_times(user_id: ObjectId, since: datetime) -> list[datetime]:
+    pipeline = [
+        {"$match": {"user_id": user_id, "updated_at": {"$gte": since}}},
+        {"$unwind": "$messages"},
+        {"$match": {"messages.role": "user", "messages.created_at": {"$gte": since}}},
+        {"$project": {"_id": 0, "at": "$messages.created_at"}},
+    ]
+    cursor = await _conversations().aggregate(pipeline)
+    return [item["at"] for item in await cursor.to_list()]

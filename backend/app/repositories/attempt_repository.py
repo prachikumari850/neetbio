@@ -43,6 +43,17 @@ async def list_submitted(user_id: ObjectId, limit: int) -> list[dict]:
     return await cursor.to_list()
 
 
+async def list_all_submitted(user_id: ObjectId, limit: int) -> list[dict]:
+    cursor = (
+        _attempts()
+        .find({"user_id": user_id, "status": "submitted"})
+        .sort("submitted_at", -1)
+        .limit(limit)
+    )
+    attempts = await cursor.to_list()
+    return list(reversed(attempts))
+
+
 async def delete_stale(user_id: ObjectId, before: datetime) -> None:
     await _attempts().delete_many(
         {"user_id": user_id, "status": "in_progress", "started_at": {"$lt": before}}
