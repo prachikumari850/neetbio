@@ -1,19 +1,24 @@
 import { useRef, useState } from 'react'
-import { Bot, FileText, History, Image as ImageIcon, MessageSquare, Sparkles, Zap } from 'lucide-react'
+import { Bot, FileText, History, Image as ImageIcon, MessageSquare, Plus, Sparkles, Trash2, Zap } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { useSearchParams } from 'react-router-dom'
 import AnalyzeImagePanel from '@/components/ai/AnalyzeImagePanel'
 import ChatPanel from '@/components/ai/ChatPanel'
 import GenerateImagePanel from '@/components/ai/GenerateImagePanel'
 import GenerateSideCard from '@/components/ai/GenerateSideCard'
 import SummarizePanel from '@/components/ai/SummarizePanel'
+import Button from '@/components/common/Button'
 import Card from '@/components/common/Card'
 import FeatureChecklist from '@/components/common/FeatureChecklist'
 import PageHeader from '@/components/common/PageHeader'
 import SectionCard from '@/components/common/SectionCard'
 import Tabs from '@/components/common/Tabs'
-import { promptTiles, recentChats, welcomeMessage } from '@/data/mockAi'
+import { promptTiles, welcomeMessage } from '@/data/mockAi'
+import { useConversations } from '@/hooks/useConversations'
 import { useDiagramGeneration } from '@/hooks/useDiagramGeneration'
+import { getConversation } from '@/services/aiService'
 import { cx } from '@/utils/classNames'
+import { formatShortDate } from '@/utils/formatters'
 
 const tabs = [
     { id: 'chat', label: 'AI Chat (Ask Anything)', icon: MessageSquare },
@@ -25,15 +30,26 @@ const tabs = [
 const DEFAULT_TILE_COUNT = 4
 const DEFAULT_CHAT_COUNT = 3
 
+function createSession(
+    key,
+    { messages = [welcomeMessage], conversationId = null, draft = '', diagramId = '' } = {},
+) {
+    return { key, messages, conversationId, draft, diagramId }
+}
+
 function AILearn() {
     const [searchParams, setSearchParams] = useSearchParams()
     const generation = useDiagramGeneration()
-    const sessionNumber = useRef(0)
-    const [chatSession, setChatSession] = useState(() => ({
-        key: 'new',
-        messages: [welcomeMessage],
-        prompt: searchParams.get('prompt'),
-    }))
+    const conversations = useConversations()
+    const [chatSession, setChatSession] = useState(() =>
+        createSession('new', {
+            draft: searchParams.get('prompt') ?? '',
+            diagramId: searchParams.get('diagram') ?? '',
+        }),
+    )
+    const [activeConversationId, setActiveConversationId] = useState(null)
+    const sessionSequence = useRef(0)
+    const conversationLoadSequence = useRef(0)
     const [showAllPrompts, setShowAllPrompts] = useState(false)
     const [showAllChats, setShowAllChats] = useState(false)
 
@@ -42,19 +58,57 @@ function AILearn() {
 
     const setActiveTab = (tabId) => setSearchParams({ tab: tabId })
 
-    const startChat = (prompt) => {
-        sessionNumber.current += 1
-        setChatSession({
-            key: `new-session-${sessionNumber.current}`,
-            messages: [welcomeMessage],
-            prompt,
-        })
+    const startChat = (draft = '') => {
+        conversationLoadSequence.current += 1
+        sessionSequence.current += 1
+        setChatSession(createSession(`chat-${sessionSequence.current}`, { draft }))
+        setActiveConversationId(null)
         setActiveTab('chat')
     }
 
-    const openRecentChat = (chat) => {
-        setChatSession({ key: `recent-${chat.id}`, messages: chat.messages, prompt: null })
-        setActiveTab('chat')
+    const openRecentChat = async (chat) => {
+        const loadSequence = ++conversationLoadSequence.current
+        sessionSequence.current += 1
+        const sessionKey = `chat-${sessionSequence.current}`
+
+        try {
+            const conversation = await getConversation(chat.id)
+            if (loadSequence !== conversationLoadSequence.current) {
+                return
+            }
+
+            setChatSession(
+                createSession(sessionKey, {
+                    messages: conversation.messages,
+                    conversationId: conversation.id,
+                }),
+            )
+            setActiveConversationId(conversation.id)
+            setActiveTab('chat')
+        } catch (error) {
+            if (loadSequence === conversationLoadSequence.current) {
+                toast.error(error.message)
+            }
+        }
+    }
+
+    const deleteChat = async (chat) => {
+        try {
+            await conversations.remove(chat.id)
+
+            if (chat.id === activeConversationId) {
+                startChat()
+            }
+
+            toast.success('Chat deleted')
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const handleSaved = (conversationId) => {
+        setActiveConversationId(conversationId)
+        conversations.refresh()
     }
 
     const handleTile = (tile) => {
@@ -72,7 +126,51 @@ function AILearn() {
     }
 
     const visibleTiles = showAllPrompts ? promptTiles : promptTiles.slice(0, DEFAULT_TILE_COUNT)
-    const visibleChats = showAllChats ? recentChats : recentChats.slice(0, DEFAULT_CHAT_COUNT)
+    const visibleChats = showAllChats
+        ? conversations.items
+        : conversations.items.slice(0, DEFAULT_CHAT_COUNT)
+
+    const renderRecentChats = () => {
+        if (conversations.status === 'loading') {
+            return <p className="text-ink-500 py-2 text-sm">Loading chats...</p>
+        }
+
+        if (conversations.status === 'error') {
+            return <p className="text-ink-500 py-2 text-sm">Couldn’t load your chats right now.</p>
+        }
+
+        if (visibleChats.length === 0) {
+            return <p className="text-ink-500 py-2 text-sm">Your chats will appear here.</p>
+        }
+
+        return (
+            <ul className="divide-line divide-y">
+                {visibleChats.map((chat) => (
+                    <li key={chat.id} className="flex items-center gap-1">
+                        <button
+                            type="button"
+                            onClick={() => openRecentChat(chat)}
+                            className="hover:bg-page flex min-w-0 flex-1 items-center gap-3 rounded-lg px-1 py-2.5 text-left text-sm"
+                        >
+                            <MessageSquare className="text-brand-purple size-5 shrink-0" />
+                            <span className="flex-1 truncate font-medium">{chat.title}</span>
+                            <span className="text-ink-500 shrink-0 text-xs">
+                                {formatShortDate(chat.updatedAt)}
+                            </span>
+                        </button>
+                        <button
+                            type="button"
+                            aria-label={`Delete chat: ${chat.title}`}
+                            onClick={() => deleteChat(chat)}
+                            className="text-ink-500 hover:bg-danger-soft hover:text-danger shrink-0 rounded-full p-1.5"
+                        >
+                            <Trash2 className="size-4" />
+                        </button>
+                    </li>
+                ))}
+            </ul>
+        )
+    }
 
     return (
         <>
@@ -95,12 +193,21 @@ function AILearn() {
                 <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} variant="separate" />
 
                 <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-                    <Card className="p-5">
+                    <Card className="min-w-0 p-5">
                         <div hidden={activeTab !== 'chat'}>
+                            <div className="mb-3 flex justify-end">
+                                <Button variant="outline" size="sm" onClick={() => startChat()}>
+                                    <Plus className="size-4" />
+                                    New chat
+                                </Button>
+                            </div>
                             <ChatPanel
                                 key={chatSession.key}
                                 initialMessages={chatSession.messages}
-                                initialPrompt={chatSession.prompt}
+                                initialConversationId={chatSession.conversationId}
+                                initialDraft={chatSession.draft}
+                                initialDiagramId={chatSession.diagramId}
+                                onSaved={handleSaved}
                                 onAttach={() => setActiveTab('analyze')}
                             />
                         </div>
@@ -115,7 +222,7 @@ function AILearn() {
                         </div>
                     </Card>
 
-                    <div className="space-y-5">
+                    <div className="min-w-0 space-y-5">
                         <GenerateSideCard generation={generation} onGenerate={handleSideGenerate} />
 
                         <SectionCard
@@ -150,26 +257,16 @@ function AILearn() {
                             icon={History}
                             title="Recent Chats"
                             iconClassName="text-brand-purple"
-                            action={{
-                                label: showAllChats ? 'Show Less' : 'View All',
-                                onClick: () => setShowAllChats((current) => !current),
-                            }}
+                            action={
+                                conversations.items.length > DEFAULT_CHAT_COUNT
+                                    ? {
+                                        label: showAllChats ? 'Show Less' : 'View All',
+                                        onClick: () => setShowAllChats((current) => !current),
+                                    }
+                                    : undefined
+                            }
                         >
-                            <ul className="divide-line divide-y">
-                                {visibleChats.map((chat) => (
-                                    <li key={chat.id}>
-                                        <button
-                                            type="button"
-                                            onClick={() => openRecentChat(chat)}
-                                            className="hover:bg-page flex w-full items-center gap-3 rounded-lg px-1 py-2.5 text-left text-sm"
-                                        >
-                                            <MessageSquare className="text-brand-purple size-5 shrink-0" />
-                                            <span className="flex-1 font-medium">{chat.title}</span>
-                                            <span className="text-ink-500 shrink-0 text-xs">{chat.when}</span>
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                            {renderRecentChats()}
                         </SectionCard>
                     </div>
                 </div>

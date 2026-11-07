@@ -1,4 +1,5 @@
 import os
+from types import SimpleNamespace
 
 os.environ["MONGODB_DB_NAME"] = "neetbio_test"
 os.environ["MONGODB_TIMEOUT_MS"] = "500"
@@ -12,6 +13,22 @@ from pymongo.errors import PyMongoError  # noqa: E402
 from app.core.config import get_settings  # noqa: E402
 from app.database.seed import load_seed_diagrams  # noqa: E402
 from app.main import app  # noqa: E402
+from app.services import analysis_service, ollama_client, rag_service  # noqa: E402
+from app.services.ollama_client import OllamaError  # noqa: E402
+
+
+def keyword_vector(text: str) -> list[float]:
+    lowered = text.lower()
+    return [
+        1.0 if "chloroplast" in lowered else 0.0,
+        1.0 if "nephron" in lowered else 0.0,
+        0.0,
+    ]
+
+
+@pytest.fixture(autouse=True)
+def reset_analysis_state():
+    analysis_service._state["busy"] = False
 
 
 @pytest.fixture
@@ -71,3 +88,57 @@ def make_user(db_client):
         return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
     return create
+
+
+@pytest.fixture
+def fake_ollama(monkeypatch):
+    state = SimpleNamespace(
+        replies=["Hello ", "student."],
+        vision_replies=["Plant ", "cell."],
+        error=None,
+        calls=[],
+        vision_calls=[],
+    )
+
+    async def stream_chat(messages):
+        state.calls.append(messages)
+
+        if state.error:
+            raise OllamaError(state.error)
+
+        for part in state.replies:
+            yield part
+
+    async def stream_vision(messages):
+        state.vision_calls.append(messages)
+
+        if state.error:
+            raise OllamaError(state.error)
+
+        for part in state.vision_replies:
+            yield part
+
+    async def embed(texts):
+        return [keyword_vector(text) for text in texts]
+
+    monkeypatch.setattr(ollama_client, "stream_chat", stream_chat)
+    monkeypatch.setattr(ollama_client, "stream_vision", stream_vision)
+    monkeypatch.setattr(ollama_client, "embed", embed)
+    return state
+
+
+@pytest.fixture
+def indexed_knowledge(seeded_client, test_database):
+    chunks = [
+        chunk
+        for diagram in load_seed_diagrams()
+        for chunk in rag_service.build_chunks(diagram)
+    ]
+    model = get_settings().ollama_embed_model
+    test_database["knowledge_chunks"].insert_many(
+        [
+            {**chunk, "embedding": keyword_vector(chunk["text"]), "model": model}
+            for chunk in chunks
+        ]
+    )
+    return seeded_client

@@ -1,19 +1,32 @@
-import { useEffect, useState } from 'react'
-import { ImageUp, LoaderCircle, Sparkles, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ImageUp, Sparkles, Square, X } from 'lucide-react'
 import { useDropzone } from 'react-dropzone'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
+import AiStatusNotice from '@/components/ai/AiStatusNotice'
 import Button from '@/components/common/Button'
-import { buildImageAnalysis } from '@/utils/aiSimulator'
+import { streamAnalysis } from '@/services/aiService'
 import { cx } from '@/utils/classNames'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
-const ANALYSIS_DELAY_MS = 1200
+const ACCEPTED_TYPES = {
+    'image/png': [],
+    'image/jpeg': [],
+    'image/webp': [],
+}
+
+const resultClasses =
+    'bg-brand-purple-soft/60 rounded-2xl px-4 py-3 text-sm break-words [&_li]:mb-1 [&_p]:mb-2 [&_strong]:font-bold [&_ul]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&>*:last-child]:mb-0'
 
 function AnalyzeImagePanel() {
     const [selected, setSelected] = useState(null)
-    const [isAnalyzing, setIsAnalyzing] = useState(false)
-    const [analysis, setAnalysis] = useState('')
+    const [question, setQuestion] = useState('')
+    const [result, setResult] = useState('')
+    const [error, setError] = useState('')
+    const [isRunning, setIsRunning] = useState(false)
+    const abortRef = useRef(null)
+
+    useEffect(() => () => abortRef.current?.abort(), [])
 
     useEffect(() => {
         return () => {
@@ -23,38 +36,69 @@ function AnalyzeImagePanel() {
         }
     }, [selected])
 
-    useEffect(() => {
-        if (!isAnalyzing || !selected) {
-            return
-        }
-
-        const timer = setTimeout(() => {
-            setAnalysis(buildImageAnalysis(selected.file.name))
-            setIsAnalyzing(false)
-        }, ANALYSIS_DELAY_MS)
-
-        return () => clearTimeout(timer)
-    }, [isAnalyzing, selected])
-
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        accept: { 'image/*': [] },
+        accept: ACCEPTED_TYPES,
         maxFiles: 1,
         maxSize: MAX_FILE_SIZE,
+        disabled: isRunning,
         onDropAccepted: ([file]) => {
             setSelected({ file, url: URL.createObjectURL(file) })
-            setAnalysis('')
+            setResult('')
+            setError('')
         },
-        onDropRejected: () => toast.error('Choose one image file under 5 MB.'),
+        onDropRejected: () => toast.error('Choose one PNG, JPEG or WEBP image under 5 MB.'),
     })
 
     const clearImage = () => {
+        abortRef.current?.abort()
         setSelected(null)
-        setAnalysis('')
-        setIsAnalyzing(false)
+        setResult('')
+        setError('')
+    }
+
+    const analyze = async () => {
+        const controller = new AbortController()
+        let isDone = false
+
+        abortRef.current = controller
+        setResult('')
+        setError('')
+        setIsRunning(true)
+
+        try {
+            await streamAnalysis({
+                image: selected.file,
+                question: question.trim(),
+                signal: controller.signal,
+                onEvent: (event) => {
+                    if (event.type === 'token') {
+                        setResult((current) => current + event.text)
+                    } else if (event.type === 'error') {
+                        throw new Error(event.message)
+                    } else if (event.type === 'done') {
+                        isDone = true
+                    }
+                },
+            })
+
+            if (!isDone) {
+                throw new Error('The analysis was interrupted. Please try again.')
+            }
+        } catch (analysisError) {
+            if (!controller.signal.aborted) {
+                setResult('')
+                setError(analysisError.message)
+            }
+        } finally {
+            abortRef.current = null
+            setIsRunning(false)
+        }
     }
 
     return (
         <div className="space-y-4">
+            <AiStatusNotice feature="vision" />
+
             {selected ? (
                 <div className="border-line relative rounded-2xl border bg-white p-3">
                     <button
@@ -70,7 +114,7 @@ function AnalyzeImagePanel() {
                         alt="Selected for analysis"
                         className="mx-auto max-h-72 object-contain"
                     />
-                    <p className="text-ink-500 mt-2 text-center text-xs">{selected.file.name}</p>
+                    <p className="text-ink-500 mt-2 text-center text-xs break-all">{selected.file.name}</p>
                 </div>
             ) : (
                 <div
@@ -87,24 +131,59 @@ function AnalyzeImagePanel() {
                 </div>
             )}
 
-            <Button
-                onClick={() => setIsAnalyzing(true)}
-                disabled={!selected || isAnalyzing}
-                className="w-full"
-            >
-                {isAnalyzing ? (
-                    <LoaderCircle className="size-5 animate-spin" />
-                ) : (
-                    <Sparkles className="size-5" />
-                )}
-                {isAnalyzing ? 'Analyzing...' : 'Analyze Image'}
-            </Button>
+            <div>
+                <label htmlFor="analysis-question" className="mb-1 block text-sm font-bold">
+                    Question about the image (optional)
+                </label>
+                <input
+                    id="analysis-question"
+                    type="text"
+                    value={question}
+                    maxLength={500}
+                    disabled={isRunning}
+                    onChange={(event) => setQuestion(event.target.value)}
+                    placeholder="Explain this image in detail."
+                    className="border-line focus:ring-brand-purple/40 w-full rounded-full border bg-white px-4 py-2.5 text-sm outline-none focus:ring-2"
+                />
+            </div>
 
-            {analysis && (
-                <div className="bg-brand-purple-soft/60 space-y-2 rounded-2xl px-4 py-3 text-sm [&_li]:mb-1 [&_p]:mb-2 [&_ul]:list-disc [&_ul]:pl-5">
-                    <ReactMarkdown>{analysis}</ReactMarkdown>
+            {isRunning ? (
+                <Button variant="outline" onClick={() => abortRef.current?.abort()} className="w-full">
+                    <Square className="size-4 fill-current" />
+                    Stop
+                </Button>
+            ) : (
+                <Button onClick={analyze} disabled={!selected} className="w-full">
+                    <Sparkles className="size-5" />
+                    Analyze Image
+                </Button>
+            )}
+
+            {isRunning && !result && (
+                <p className="text-ink-500 text-center text-sm">
+                    Reading the image. On a laptop without a graphics card the first words can take a minute or more.
+                </p>
+            )}
+
+            {error && (
+                <p
+                    role="alert"
+                    className="bg-danger-soft text-danger rounded-xl px-4 py-3 text-sm font-semibold"
+                >
+                    {error}
+                </p>
+            )}
+
+            {result && (
+                <div className={resultClasses}>
+                    <ReactMarkdown>{result}</ReactMarkdown>
                 </div>
             )}
+
+            <p className="text-ink-500 text-center text-xs">
+                Your image is analyzed by a small AI model on your computer and is not saved. It can
+                misread labels, so check important facts in your NCERT textbook.
+            </p>
         </div>
     )
 }

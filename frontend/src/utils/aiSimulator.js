@@ -1,8 +1,4 @@
-import {
-    diagramTemplates,
-    fallbackReply,
-    simulatedReplies,
-} from '@/data/mockAi'
+import { diagramTemplates } from '@/data/mockAi'
 
 const STOP_WORDS = new Set([
     'the', 'and', 'that', 'with', 'this', 'from', 'are', 'for', 'was', 'were',
@@ -16,25 +12,6 @@ export function createMessage(role, content) {
         role,
         content,
     }
-}
-
-export function getSimulatedReply(question) {
-    const text = question.toLowerCase()
-    const match = simulatedReplies.find(({ keywords }) =>
-        keywords.some((keyword) => text.includes(keyword)),
-    )
-
-    return match ? match.content : fallbackReply
-}
-
-export function buildImageAnalysis(fileName) {
-    return [
-        `**Simulated analysis for \`${fileName}\`**`,
-        'No AI model has looked at this image yet. Once the backend is connected, this panel will show:',
-        '- The diagram or structure that was identified',
-        '- Key components and what each one does',
-        '- NEET-focused notes and likely exam questions',
-    ].join('\n\n')
 }
 
 export function findDiagramTemplate(prompt) {

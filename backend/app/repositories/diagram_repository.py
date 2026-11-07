@@ -39,6 +39,10 @@ async def find_by_id(diagram_id: str) -> dict | None:
     return await _diagrams().find_one({"_id": diagram_id})
 
 
+async def list_all() -> list[dict]:
+    return await _diagrams().find({}).sort("order").to_list()
+
+
 async def list_facet_source() -> list[dict]:
     cursor = _diagrams().find({}, FACET_FIELDS).sort("order")
     return await cursor.to_list()
