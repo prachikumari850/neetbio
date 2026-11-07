@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowRight, BookOpen, ClipboardList, Layers, Star, Target } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useSearchParams } from 'react-router-dom'
 import Button from '@/components/common/Button'
 import Card from '@/components/common/Card'
+import EmptyState from '@/components/common/EmptyState'
 import HeaderStat from '@/components/common/HeaderStat'
+import LoadingSpinner from '@/components/common/LoadingSpinner'
 import PageHeader from '@/components/common/PageHeader'
 import SectionCard from '@/components/common/SectionCard'
 import Tabs from '@/components/common/Tabs'
@@ -15,71 +17,102 @@ import TestList from '@/components/practice/TestList'
 import TestProgressCard from '@/components/practice/TestProgressCard'
 import TestResults from '@/components/practice/TestResults'
 import TestRunner from '@/components/practice/TestRunner'
-import { questionBank } from '@/data/mockQuestions'
-import { practiceTabs, recommendedTestIds, testCatalog } from '@/data/mockPractice'
+import { practiceTabs } from '@/data/mockPractice'
+import { usePracticeCatalog } from '@/hooks/usePracticeCatalog'
+import { startAttempt, submitAttempt } from '@/services/practiceService'
 import { useTestStore } from '@/store/useTestStore'
-import { toMinutes } from '@/utils/formatters'
-import { buildTest, evaluateTest } from '@/utils/testBuilder'
+import {
+    buildChapterTests,
+    buildMockTests,
+    buildPyqTests,
+    pickRecommended,
+} from '@/utils/practiceTests'
 
-const recommendedTests = recommendedTestIds
-    .map((id) => testCatalog.find((test) => test.id === id))
-    .filter(Boolean)
+function parseStartParam(value) {
+    if (value?.startsWith('mock-') && Number.isInteger(Number(value.slice(5)))) {
+        return { mode: 'mock', count: Number(value.slice(5)) }
+    }
 
-const headerStats = [
-    { icon: Target, value: questionBank.length, label: 'Practice Qs', tone: 'text-danger' },
-    { icon: Layers, value: testCatalog.filter((test) => test.category === 'chapter').length, label: 'Chapter Tests', tone: 'text-brand-purple' },
-    { icon: ClipboardList, value: testCatalog.filter((test) => test.category === 'mock').length, label: 'Full Mock Tests', tone: 'text-accent-pink' },
-]
+    if (value?.startsWith('area-')) {
+        return { mode: 'area', area: value.slice(5) }
+    }
+
+    return null
+}
 
 function PracticeTests() {
     const [searchParams, setSearchParams] = useSearchParams()
-    const addResult = useTestStore((state) => state.addResult)
-    const [activeTest, setActiveTest] = useState(() => {
-        const config = testCatalog.find((test) => test.id === searchParams.get('start'))
-        return config ? buildTest(config) : null
-    })
+    const loadResults = useTestStore((state) => state.load)
+    const catalog = usePracticeCatalog()
+    const [activeTest, setActiveTest] = useState(null)
     const [outcome, setOutcome] = useState(null)
+    const startingRef = useRef(false)
+    const submittingRef = useRef(false)
+    const autoStartedRef = useRef(null)
 
+    const startParam = searchParams.get('start')
     const requestedTab = searchParams.get('tab')
     const activeTab = practiceTabs.some((tab) => tab.id === requestedTab) ? requestedTab : 'practice'
 
     const setActiveTab = (tabId) => setSearchParams({ tab: tabId })
 
-    const startTest = (config) => {
-        const test = buildTest(config)
-
-        if (test.questions.length === 0) {
-            toast.error('No questions match those choices yet.')
+    const beginTest = useCallback(async (request) => {
+        if (startingRef.current) {
             return
         }
 
-        setOutcome(null)
-        setActiveTest(test)
-    }
+        startingRef.current = true
 
-    const startSubjectPractice = (subject) =>
-        startTest({
-            id: `practice-${subject.id}`,
-            title: `${subject.label} – Practice`,
-            subjects: [subject.id],
-            count: 5,
-            durationMin: 5,
-        })
+        try {
+            const attempt = await startAttempt(request)
+            setOutcome(null)
+            setActiveTest({ ...attempt, request })
+        } catch (error) {
+            toast.error(error.message)
+        } finally {
+            startingRef.current = false
+        }
+    }, [])
 
-    const handleSubmit = ({ answers, timeTakenSec }) => {
-        const evaluation = evaluateTest(activeTest.questions, answers)
+    useEffect(() => {
+        if (!startParam) {
+            autoStartedRef.current = null
+            return
+        }
 
-        addResult({
-            id: `result-${Date.now()}`,
-            title: activeTest.title,
-            subjectId: activeTest.subjectId,
-            correct: evaluation.correct,
-            total: activeTest.questions.length,
-            accuracy: evaluation.accuracy,
-            minutes: toMinutes(timeTakenSec),
-            takenAt: new Date().toISOString(),
-        })
-        setOutcome({ evaluation, timeTakenSec })
+        if (autoStartedRef.current === startParam) {
+            return
+        }
+
+        autoStartedRef.current = startParam
+        const request = parseStartParam(startParam)
+
+        if (request) {
+            queueMicrotask(() => {
+                if (autoStartedRef.current === startParam) {
+                    void beginTest(request)
+                }
+            })
+        } else {
+            toast.error('That test is not available.')
+        }
+    }, [startParam, beginTest])
+
+    const handleSubmit = async ({ answers }) => {
+        if (submittingRef.current) {
+            return
+        }
+
+        submittingRef.current = true
+
+        try {
+            setOutcome(await submitAttempt(activeTest.id, answers))
+            loadResults()
+        } catch (error) {
+            toast.error(`${error.message} Press Submit Test to try again.`)
+        } finally {
+            submittingRef.current = false
+        }
     }
 
     const leaveTest = () => {
@@ -94,7 +127,7 @@ function PracticeTests() {
                 test={activeTest}
                 evaluation={outcome.evaluation}
                 timeTakenSec={outcome.timeTakenSec}
-                onRetry={() => startTest(activeTest.config)}
+                onRetry={() => beginTest(activeTest.request)}
                 onBack={leaveTest}
             />
         )
@@ -102,6 +135,117 @@ function PracticeTests() {
 
     if (activeTest) {
         return <TestRunner key={activeTest.id} test={activeTest} onSubmit={handleSubmit} onExit={leaveTest} />
+    }
+
+    const data = catalog.data
+    const mockTests = data ? buildMockTests(data.mockSizes) : []
+    const chapterTests = data ? buildChapterTests(data.chapters) : []
+    const pyqTests = data ? buildPyqTests(data.pyqYears) : []
+    const areaCounts = Object.fromEntries((data?.areas ?? []).map((area) => [area.id, area.count]))
+
+    const headerStats = [
+        { icon: Target, value: data?.totals.questions ?? 0, label: 'Practice Qs', tone: 'text-danger' },
+        { icon: Layers, value: chapterTests.length, label: 'Chapter Tests', tone: 'text-brand-purple' },
+        { icon: ClipboardList, value: mockTests.length, label: 'Full Mock Tests', tone: 'text-accent-pink' },
+    ]
+
+    const renderTabContent = () => {
+        if (activeTab === 'practice') {
+            return (
+                <>
+                    <SectionCard icon={Target} title="Choose Practice Mode" iconClassName="text-danger">
+                        <SubjectModeGrid
+                            counts={areaCounts}
+                            onStart={(subject) => beginTest({ mode: 'area', area: subject.id })}
+                        />
+                    </SectionCard>
+
+                    <SectionCard icon={Star} title="Recommended for You" iconClassName="fill-brand-orange text-brand-orange">
+                        <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+                            <TestList
+                                tests={pickRecommended(mockTests, chapterTests)}
+                                onStart={beginTest}
+                                emptyTitle="Recommendations will appear as questions are added"
+                            />
+                            <Card className="flex flex-col items-center gap-2 bg-linear-to-b from-[#ffe9ef] to-white p-5 text-center">
+                                <ClipboardList className="text-accent-pink size-12" />
+                                <h3 className="text-lg leading-tight font-extrabold">Create Your Custom Test</h3>
+                                <p className="text-ink-700 text-xs">
+                                    Choose subjects, question count and difficulty level.
+                                </p>
+                                <Button variant="purple" size="sm" onClick={() => setActiveTab('custom')} className="mt-auto w-full">
+                                    Create Test
+                                    <ArrowRight className="size-4" />
+                                </Button>
+                            </Card>
+                        </div>
+                    </SectionCard>
+                </>
+            )
+        }
+
+        if (activeTab === 'custom') {
+            return (
+                <SectionCard icon={BookOpen} title="Create Your Custom Test">
+                    <CustomTestForm onStart={beginTest} />
+                </SectionCard>
+            )
+        }
+
+        const tabLists = {
+            mock: {
+                tests: mockTests,
+                emptyTitle: 'No mock tests available yet',
+                emptyDescription: 'Mock tests appear once the question bank is large enough.',
+            },
+            chapter: {
+                tests: chapterTests,
+                emptyTitle: 'No chapter tests available yet',
+                emptyDescription: 'A chapter test appears once a chapter has at least 2 questions.',
+            },
+            pyq: {
+                tests: pyqTests,
+                emptyTitle: 'No previous-year questions yet',
+                emptyDescription:
+                    'Previous-year questions are added only with their official answer key and a confirmed right to reuse them.',
+            },
+        }
+        const { tests, emptyTitle, emptyDescription } = tabLists[activeTab]
+
+        return (
+            <SectionCard icon={BookOpen} title={practiceTabs.find((tab) => tab.id === activeTab).label}>
+                <TestList
+                    tests={tests}
+                    onStart={beginTest}
+                    emptyTitle={emptyTitle}
+                    emptyDescription={emptyDescription}
+                />
+            </SectionCard>
+        )
+    }
+
+    const renderLeftColumn = () => {
+        if (catalog.status === 'error') {
+            return (
+                <Card>
+                    <EmptyState
+                        icon={Target}
+                        title="Couldn’t load the question bank"
+                        description="Check that the backend is running and try again."
+                    >
+                        <Button variant="soft" onClick={catalog.retry}>
+                            Try again
+                        </Button>
+                    </EmptyState>
+                </Card>
+            )
+        }
+
+        if (catalog.status === 'loading') {
+            return <LoadingSpinner label="Loading questions..." />
+        }
+
+        return renderTabContent()
     }
 
     return (
@@ -123,53 +267,7 @@ function PracticeTests() {
                 <Tabs tabs={practiceTabs} activeTab={activeTab} onChange={setActiveTab} />
 
                 <div className="grid gap-5 xl:grid-cols-[1.5fr_1fr]">
-                    <div className="space-y-5">
-                        {activeTab === 'practice' && (
-                            <>
-                                <SectionCard icon={Target} title="Choose Practice Mode" iconClassName="text-danger">
-                                    <SubjectModeGrid onStart={startSubjectPractice} />
-                                </SectionCard>
-
-                                <SectionCard icon={Star} title="Recommended for You" iconClassName="fill-brand-orange text-brand-orange">
-                                    <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
-                                        <TestList tests={recommendedTests} onStart={startTest} />
-                                        <Card className="flex flex-col items-center gap-2 bg-linear-to-b from-[#ffe9ef] to-white p-5 text-center">
-                                            <ClipboardList className="text-accent-pink size-12" />
-                                            <h3 className="text-lg leading-tight font-extrabold">Create Your Custom Test</h3>
-                                            <p className="text-ink-700 text-xs">
-                                                Choose chapters, question count and difficulty level.
-                                            </p>
-                                            <Button variant="purple" size="sm" onClick={() => setActiveTab('custom')} className="mt-auto w-full">
-                                                Create Test
-                                                <ArrowRight className="size-4" />
-                                            </Button>
-                                        </Card>
-                                    </div>
-                                </SectionCard>
-                            </>
-                        )}
-
-                        {['mock', 'chapter', 'pyq'].includes(activeTab) && (
-                            <SectionCard
-                                icon={BookOpen}
-                                title={practiceTabs.find((tab) => tab.id === activeTab).label}
-                            >
-                                <TestList
-                                    tests={testCatalog.filter((test) => test.category === activeTab)}
-                                    onStart={startTest}
-                                />
-                                <p className="text-ink-500 mt-4 text-xs">
-                                    Tests draw from the sample question bank. The full NEET-scale bank arrives with the backend.
-                                </p>
-                            </SectionCard>
-                        )}
-
-                        {activeTab === 'custom' && (
-                            <SectionCard icon={BookOpen} title="Create Your Custom Test">
-                                <CustomTestForm onStart={startTest} />
-                            </SectionCard>
-                        )}
-                    </div>
+                    <div className="space-y-5">{renderLeftColumn()}</div>
 
                     <div className="space-y-5">
                         <TestProgressCard />

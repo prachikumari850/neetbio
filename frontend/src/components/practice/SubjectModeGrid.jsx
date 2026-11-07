@@ -1,21 +1,21 @@
 import { ArrowRight } from 'lucide-react'
 import { practiceSubjects } from '@/data/mockPractice'
 import { cx } from '@/utils/classNames'
-import { getQuestionPool } from '@/utils/testBuilder'
 
-function SubjectModeGrid({ onStart }) {
+function SubjectModeGrid({ counts, onStart }) {
     return (
         <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {practiceSubjects.map((subject) => {
-                const questionCount = getQuestionPool({ subjects: [subject.id] }).length
+                const questionCount = counts[subject.id] ?? 0
 
                 return (
                     <li key={subject.id}>
                         <button
                             type="button"
+                            disabled={questionCount === 0}
                             onClick={() => onStart(subject)}
                             className={cx(
-                                'border-line flex h-full w-full items-center gap-3 rounded-2xl border bg-linear-to-br p-4 text-left transition hover:-translate-y-0.5',
+                                'border-line flex h-full w-full items-center gap-3 rounded-2xl border bg-linear-to-br p-4 text-left transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50',
                                 subject.tint,
                             )}
                         >

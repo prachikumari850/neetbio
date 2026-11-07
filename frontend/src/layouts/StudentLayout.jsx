@@ -4,16 +4,19 @@ import Sidebar from '@/components/layout/Sidebar'
 import Topbar from '@/components/layout/Topbar'
 import { findNavigationItem } from '@/data/navigation'
 import { useBookmarkStore } from '@/store/useBookmarkStore'
+import { useTestStore } from '@/store/useTestStore'
 
 function StudentLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const { pathname } = useLocation()
     const activeItem = findNavigationItem(pathname)
     const loadBookmarks = useBookmarkStore((state) => state.load)
+    const loadTestResults = useTestStore((state) => state.load)
 
     useEffect(() => {
         loadBookmarks()
-    }, [loadBookmarks])
+        loadTestResults()
+    }, [loadBookmarks, loadTestResults])
 
     return (
         <div className="bg-page-gradient min-h-screen">

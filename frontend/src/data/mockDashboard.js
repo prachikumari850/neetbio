@@ -39,7 +39,6 @@ export const initialDailyTasks = [
     { id: 'bookmarks', label: 'Review saved bookmarks', done: false },
 ]
 
-export const upcomingPracticeTestId = 'mock-2'
 
 export const recommendedDiagramIds = [
     'flower',

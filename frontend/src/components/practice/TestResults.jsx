@@ -9,6 +9,7 @@ import { useBookmarkToggle } from '@/hooks/useBookmarkToggle'
 import { cx } from '@/utils/classNames'
 import { questionToBookmark } from '@/utils/bookmarkItems'
 import { formatTimer } from '@/utils/formatters'
+import { describeSource } from '@/utils/questionSource'
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D']
 
@@ -150,7 +151,14 @@ function TestResults({ test, evaluation, timeTakenSec, onRetry, onBack }) {
                                             <span className="border-line flex size-6 shrink-0 items-center justify-center rounded-full border bg-white text-xs">
                                                 {OPTION_LABELS[optionIndex]}
                                             </span>
-                                            <span className="flex-1">{option}</span>
+                                            <span className="flex-1">
+                                                {option}
+                                                {question.optionNotes[optionIndex] && (
+                                                    <span className="text-ink-700 mt-0.5 block text-xs font-normal">
+                                                        {question.optionNotes[optionIndex]}
+                                                    </span>
+                                                )}
+                                            </span>
                                             {optionIndex === question.correctIndex && (
                                                 <CircleCheck className="fill-success size-5 text-white" />
                                             )}
@@ -164,6 +172,7 @@ function TestResults({ test, evaluation, timeTakenSec, onRetry, onBack }) {
                                 <p className="text-ink-700 text-sm">
                                     <strong>Explanation:</strong> {question.explanation}
                                 </p>
+                                <p className="text-ink-500 text-xs">Source: {describeSource(question.source)}</p>
                             </Card>
                         </li>
                     )

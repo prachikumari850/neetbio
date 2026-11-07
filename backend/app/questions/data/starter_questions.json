@@ -1,0 +1,564 @@
+{
+    "defaults": {
+        "class_level": "11",
+        "type": "mcq",
+        "difficulty": "easy",
+        "source": {
+            "type": "ai_drafted",
+            "name": "NEETBIO starter set (AI-drafted from NCERT concepts)",
+            "notes": "Written by an AI assistant from standard NCERT facts. Needs human review before students see it."
+        }
+    },
+    "questions": [
+        {
+            "id": "bot-001",
+            "subject": "botany",
+            "unit": "plant-physiology",
+            "chapter": "Photosynthesis in Higher Plants",
+            "topic": "Calvin cycle",
+            "text": "In C3 plants, the first stable product of CO₂ fixation is:",
+            "options": [
+                "Oxaloacetic acid",
+                "3-Phosphoglyceric acid (PGA)",
+                "Malic acid",
+                "Ribulose bisphosphate"
+            ],
+            "correct_index": 1,
+            "explanation": "RuBisCO adds CO₂ to ribulose bisphosphate (RuBP), and the unstable six-carbon product splits into two molecules of 3-phosphoglyceric acid. Oxaloacetic acid is the first stable product in C₄ plants, and RuBP is the CO₂ acceptor, not a product."
+        },
+        {
+            "id": "bot-002",
+            "subject": "botany",
+            "unit": "plant-physiology",
+            "chapter": "Photosynthesis in Higher Plants",
+            "topic": "Light reactions",
+            "difficulty": "medium",
+            "text": "Splitting of water (photolysis) during the light reactions is associated with:",
+            "options": [
+                "Photosystem I",
+                "Photosystem II",
+                "Cytochrome b₆f complex",
+                "ATP synthase"
+            ],
+            "correct_index": 1,
+            "explanation": "The oxygen-evolving complex on the lumen side of photosystem II (P680) splits water, releasing O₂, protons and electrons. Photosystem I (P700) reduces NADP⁺, the cytochrome complex passes electrons between the photosystems, and ATP synthase makes ATP using the proton gradient."
+        },
+        {
+            "id": "bot-003",
+            "subject": "botany",
+            "unit": "plant-physiology",
+            "chapter": "Respiration in Plants",
+            "topic": "Glycolysis",
+            "text": "The net gain of ATP from one glucose molecule during glycolysis is:",
+            "options": [
+                "2",
+                "4",
+                "6",
+                "8"
+            ],
+            "correct_index": 0,
+            "explanation": "Glycolysis uses 2 ATP and produces 4 ATP by substrate-level phosphorylation, so the net gain is 2 ATP (plus 2 NADH). The figure 4 is the gross yield, not the net."
+        },
+        {
+            "id": "bot-004",
+            "subject": "botany",
+            "unit": "plant-physiology",
+            "chapter": "Respiration in Plants",
+            "topic": "Krebs cycle",
+            "text": "The Krebs cycle takes place in the:",
+            "options": [
+                "Cytoplasm",
+                "Mitochondrial matrix",
+                "Inner mitochondrial membrane",
+                "Intermembrane space"
+            ],
+            "correct_index": 1,
+            "explanation": "NCERT places the TCA cycle in the mitochondrial matrix. Glycolysis occurs in the cytoplasm, while the electron transport chain and ATP synthase sit on the inner mitochondrial membrane."
+        },
+        {
+            "id": "bot-005",
+            "subject": "botany",
+            "unit": "plant-physiology",
+            "chapter": "Plant Growth and Development",
+            "topic": "Plant growth regulators",
+            "text": "Which plant hormone is mainly responsible for the ripening of fruits?",
+            "options": [
+                "Auxin",
+                "Gibberellin",
+                "Ethylene",
+                "Cytokinin"
+            ],
+            "correct_index": 2,
+            "explanation": "Ethylene is a gaseous hormone that promotes fruit ripening. Auxin promotes cell elongation, gibberellins promote stem elongation and bolting, and cytokinins promote cell division."
+        },
+        {
+            "id": "bot-006",
+            "subject": "botany",
+            "unit": "plant-physiology",
+            "chapter": "Mineral Nutrition",
+            "topic": "Essential elements",
+            "text": "Which mineral element is an essential constituent of the chlorophyll molecule?",
+            "options": [
+                "Iron",
+                "Magnesium",
+                "Manganese",
+                "Calcium"
+            ],
+            "correct_index": 1,
+            "explanation": "Magnesium is the central atom of the porphyrin ring of chlorophyll. Iron is needed for chlorophyll synthesis but is not part of the molecule, and calcium is a component of the middle lamella (calcium pectate)."
+        },
+        {
+            "id": "bot-007",
+            "subject": "botany",
+            "unit": "reproduction",
+            "class_level": "12",
+            "chapter": "Sexual Reproduction in Flowering Plants",
+            "topic": "Embryo sac",
+            "difficulty": "medium",
+            "text": "How many nuclei are present in a mature embryo sac of the Polygonum type?",
+            "options": [
+                "4",
+                "7",
+                "8",
+                "16"
+            ],
+            "correct_index": 2,
+            "explanation": "The embryo sac has 7 cells but 8 nuclei: one egg cell, two synergids, three antipodals and a large central cell with two polar nuclei (3 + 2 + 1 + 2 = 8). Seven is the number of cells, not nuclei."
+        },
+        {
+            "id": "bot-008",
+            "subject": "botany",
+            "unit": "reproduction",
+            "class_level": "12",
+            "chapter": "Sexual Reproduction in Flowering Plants",
+            "topic": "Double fertilisation",
+            "text": "The triploid primary endosperm nucleus is formed by the fusion of:",
+            "options": [
+                "One male gamete and the egg cell",
+                "One male gamete and the two polar nuclei",
+                "One male gamete and a synergid",
+                "Two male gametes and the egg cell"
+            ],
+            "correct_index": 1,
+            "explanation": "In double fertilisation, one male gamete fuses with the egg (syngamy) to form the diploid zygote, and the other fuses with the two polar nuclei (triple fusion) to form the triploid primary endosperm nucleus."
+        },
+        {
+            "id": "bot-009",
+            "subject": "botany",
+            "unit": "genetics-evolution",
+            "class_level": "12",
+            "chapter": "Principles of Inheritance and Variation",
+            "topic": "Test cross",
+            "text": "A cross between an F₁ hybrid and its homozygous recessive parent is called a:",
+            "options": [
+                "Reciprocal cross",
+                "Test cross",
+                "Dihybrid cross",
+                "Monohybrid cross"
+            ],
+            "correct_index": 1,
+            "explanation": "A test cross with the homozygous recessive parent reveals the genotype of the F₁ because the offspring phenotypes reflect the gametes it produces. A reciprocal cross swaps the sexes of the parents, and mono- or dihybrid describes the number of traits followed."
+        },
+        {
+            "id": "bot-010",
+            "subject": "botany",
+            "unit": "ecology",
+            "class_level": "12",
+            "chapter": "Ecosystem",
+            "topic": "Ecological pyramids",
+            "text": "The pyramid of energy in an ecosystem is:",
+            "options": [
+                "Always upright",
+                "Always inverted",
+                "Sometimes inverted",
+                "Always spindle-shaped"
+            ],
+            "correct_index": 0,
+            "explanation": "Energy is lost as heat at every trophic level (only about 10 percent passes on), so each level holds less energy than the one below and the pyramid is always upright. Pyramids of number and biomass can be inverted, for example the pyramid of biomass in the sea."
+        },
+        {
+            "id": "bot-011",
+            "subject": "botany",
+            "unit": "diversity-of-life",
+            "chapter": "Plant Kingdom",
+            "topic": "Gymnosperms",
+            "text": "Which of the following is a gymnosperm?",
+            "options": [
+                "Pteris",
+                "Pinus",
+                "Selaginella",
+                "Funaria"
+            ],
+            "correct_index": 1,
+            "explanation": "Pinus bears naked seeds in cones. Pteris is a fern and Selaginella is a club moss (both pteridophytes), and Funaria is a moss (a bryophyte)."
+        },
+        {
+            "id": "bot-012",
+            "subject": "botany",
+            "unit": "diversity-of-life",
+            "chapter": "Biological Classification",
+            "topic": "Kingdom Fungi",
+            "text": "The cell wall of fungi is mainly composed of:",
+            "options": [
+                "Cellulose",
+                "Chitin",
+                "Peptidoglycan",
+                "Pectin"
+            ],
+            "correct_index": 1,
+            "explanation": "Fungal cell walls are made of chitin and other polysaccharides. Cellulose is the main wall component in plants, and peptidoglycan is found in bacterial cell walls."
+        },
+        {
+            "id": "bot-013",
+            "subject": "botany",
+            "unit": "plant-physiology",
+            "chapter": "Transport in Plants",
+            "topic": "Water potential",
+            "difficulty": "medium",
+            "text": "At standard temperature, the water potential of pure water is:",
+            "options": [
+                "Zero",
+                "Greater than zero",
+                "Less than zero",
+                "Equal to 1 atmosphere"
+            ],
+            "correct_index": 0,
+            "explanation": "By convention, the water potential of pure water at standard temperature and atmospheric pressure is taken as zero. Dissolving a solute lowers it, so the water potential of a solution is negative."
+        },
+        {
+            "id": "bot-014",
+            "subject": "botany",
+            "unit": "plant-physiology",
+            "chapter": "Transport in Plants",
+            "topic": "Transpiration and stomata",
+            "difficulty": "medium",
+            "type": "assertion_reason",
+            "text": "Assertion (A): Stomata of most plants open during the day. Reason (R): Light causes potassium ions to accumulate in the guard cells.",
+            "options": [
+                "Both A and R are true, and R is the correct explanation of A",
+                "Both A and R are true, but R is not the correct explanation of A",
+                "A is true but R is false",
+                "A is false but R is true"
+            ],
+            "correct_index": 0,
+            "explanation": "Light triggers K⁺ uptake into the guard cells, which lowers their water potential. Water then enters, the guard cells become turgid and the stomatal pore opens, so R explains A."
+        },
+        {
+            "id": "bot-015",
+            "subject": "botany",
+            "unit": "biotechnology",
+            "class_level": "12",
+            "chapter": "Biotechnology: Principles and Processes",
+            "topic": "Recombinant DNA technology",
+            "text": "Which enzyme joins a DNA fragment to the vector in recombinant DNA technology?",
+            "options": [
+                "Restriction endonuclease",
+                "DNA ligase",
+                "Taq polymerase",
+                "Exonuclease"
+            ],
+            "correct_index": 1,
+            "explanation": "DNA ligase seals the sugar–phosphate backbone between the insert and the vector. Restriction endonucleases cut DNA at specific sequences, Taq polymerase amplifies DNA in PCR, and exonucleases remove nucleotides from the ends."
+        },
+        {
+            "id": "bot-016",
+            "subject": "botany",
+            "unit": "ecology",
+            "class_level": "12",
+            "chapter": "Organisms and Populations",
+            "topic": "Population interactions",
+            "text": "In which interaction is one species benefited while the other is neither benefited nor harmed?",
+            "options": [
+                "Mutualism",
+                "Commensalism",
+                "Parasitism",
+                "Amensalism"
+            ],
+            "correct_index": 1,
+            "explanation": "In commensalism one species benefits and the other is unaffected, for example an orchid growing on a mango branch. Mutualism benefits both, parasitism harms the host, and amensalism harms one species while the other is unaffected."
+        },
+        {
+            "id": "bot-017",
+            "subject": "botany",
+            "unit": "plant-physiology",
+            "chapter": "Photosynthesis in Higher Plants",
+            "topic": "Calvin cycle",
+            "difficulty": "hard",
+            "text": "How many ATP and NADPH molecules are needed to fix three molecules of CO₂ in the Calvin cycle?",
+            "options": [
+                "6 ATP and 3 NADPH",
+                "9 ATP and 6 NADPH",
+                "3 ATP and 2 NADPH",
+                "18 ATP and 12 NADPH"
+            ],
+            "correct_index": 1,
+            "explanation": "Each CO₂ fixed needs 3 ATP and 2 NADPH, so three CO₂ need 9 ATP and 6 NADPH. The option 3 ATP and 2 NADPH is the requirement for a single CO₂, and 18 ATP with 12 NADPH is for six CO₂ (one glucose)."
+        },
+        {
+            "id": "bot-018",
+            "subject": "botany",
+            "unit": "cell-biology",
+            "chapter": "Cell: The Unit of Life",
+            "topic": "Cell theory",
+            "text": "The statement 'Omnis cellula-e cellula' (all cells arise from pre-existing cells) was given by:",
+            "options": [
+                "Matthias Schleiden",
+                "Theodor Schwann",
+                "Rudolf Virchow",
+                "Robert Brown"
+            ],
+            "correct_index": 2,
+            "explanation": "Rudolf Virchow (1855) added that new cells arise from pre-existing cells, completing the cell theory. Schleiden and Schwann proposed that plants and animals are made of cells, and Robert Brown discovered the nucleus."
+        },
+        {
+            "id": "zoo-001",
+            "subject": "zoology",
+            "unit": "human-physiology",
+            "chapter": "Breathing and Exchange of Gases",
+            "topic": "Mechanism of breathing",
+            "text": "Which muscle is mainly responsible for inspiration during normal quiet breathing?",
+            "options": [
+                "Diaphragm",
+                "Internal intercostal muscles",
+                "Abdominal muscles",
+                "Pectoral muscles"
+            ],
+            "correct_index": 0,
+            "explanation": "Contraction of the diaphragm flattens it and increases the volume of the thoracic cavity, with help from the external intercostal muscles. This lowers the pressure inside the lungs and air flows in. Internal intercostals and abdominal muscles act mainly in forced expiration."
+        },
+        {
+            "id": "zoo-002",
+            "subject": "zoology",
+            "unit": "human-physiology",
+            "chapter": "Body Fluids and Circulation",
+            "topic": "Cardiac cycle",
+            "text": "The pacemaker of the human heart is the:",
+            "options": [
+                "Sinoatrial (SA) node",
+                "Atrioventricular (AV) node",
+                "Bundle of His",
+                "Purkinje fibres"
+            ],
+            "correct_index": 0,
+            "explanation": "The SA node in the wall of the right atrium generates the most action potentials per minute, so it sets the heart rate. The AV node delays the impulse, and the bundle of His and Purkinje fibres conduct it through the ventricles."
+        },
+        {
+            "id": "zoo-003",
+            "subject": "zoology",
+            "unit": "human-physiology",
+            "chapter": "Excretory Products and Their Elimination",
+            "topic": "Urine formation",
+            "difficulty": "medium",
+            "text": "Ultrafiltration of blood in the nephron takes place across:",
+            "options": [
+                "The proximal convoluted tubule",
+                "The loop of Henle",
+                "The glomerular capillaries and Bowman's capsule",
+                "The collecting duct"
+            ],
+            "correct_index": 2,
+            "explanation": "Blood is filtered under pressure across the filtration membrane formed by the glomerular endothelium, the basement membrane and the podocytes of Bowman's capsule. The tubule segments and collecting duct reabsorb and secrete, but they do not filter blood."
+        },
+        {
+            "id": "zoo-004",
+            "subject": "zoology",
+            "unit": "human-physiology",
+            "chapter": "Digestion and Absorption",
+            "topic": "Digestive enzymes",
+            "text": "Digestion of starch begins in the mouth with the action of:",
+            "options": [
+                "Pepsin",
+                "Salivary amylase",
+                "Lipase",
+                "Trypsin"
+            ],
+            "correct_index": 1,
+            "explanation": "Salivary amylase in saliva hydrolyses starch into maltose. Pepsin digests proteins in the stomach, lipase digests fats, and trypsin digests proteins in the small intestine."
+        },
+        {
+            "id": "zoo-005",
+            "subject": "zoology",
+            "unit": "human-physiology",
+            "chapter": "Neural Control and Coordination",
+            "topic": "Nerve impulse",
+            "difficulty": "medium",
+            "text": "The resting membrane potential of a typical neuron is about:",
+            "options": [
+                "+70 mV",
+                "−70 mV",
+                "0 mV",
+                "−30 mV"
+            ],
+            "correct_index": 1,
+            "explanation": "At rest the membrane is more permeable to K⁺ than to Na⁺, and the sodium–potassium pump moves 3 Na⁺ out for 2 K⁺ in. This leaves the inside of the neuron negative, at about −70 mV. The inside becomes positive only during the action potential."
+        },
+        {
+            "id": "zoo-006",
+            "subject": "zoology",
+            "unit": "human-physiology",
+            "chapter": "Chemical Coordination and Integration",
+            "topic": "Pancreatic hormones",
+            "text": "Which pancreatic hormone raises the blood glucose level?",
+            "options": [
+                "Insulin",
+                "Glucagon",
+                "Somatostatin",
+                "Thyroxine"
+            ],
+            "correct_index": 1,
+            "explanation": "Glucagon from the alpha cells of the islets of Langerhans stimulates glycogenolysis and gluconeogenesis, which raises blood glucose. Insulin from beta cells lowers it, and somatostatin from delta cells inhibits both. Thyroxine is a thyroid hormone, not a pancreatic one."
+        },
+        {
+            "id": "zoo-007",
+            "subject": "zoology",
+            "unit": "reproduction",
+            "class_level": "12",
+            "chapter": "Human Reproduction",
+            "topic": "Fertilisation",
+            "difficulty": "medium",
+            "text": "In humans, fertilisation normally occurs in the:",
+            "options": [
+                "Uterus",
+                "Ampullary–isthmic junction of the fallopian tube",
+                "Cervix",
+                "Ovary"
+            ],
+            "correct_index": 1,
+            "explanation": "The ovum released at ovulation is picked up by the infundibulum and fertilised at the ampullary–isthmic junction of the fallopian tube. The fertilised egg then divides as it moves towards the uterus, where it implants."
+        },
+        {
+            "id": "zoo-008",
+            "subject": "zoology",
+            "unit": "genetics-evolution",
+            "class_level": "12",
+            "chapter": "Molecular Basis of Inheritance",
+            "topic": "DNA replication",
+            "text": "Okazaki fragments are formed during:",
+            "options": [
+                "Synthesis of the leading strand",
+                "Synthesis of the lagging strand",
+                "Transcription",
+                "Translation"
+            ],
+            "correct_index": 1,
+            "explanation": "DNA polymerase can add nucleotides only in the 5′→3′ direction, so the lagging strand is made discontinuously as short Okazaki fragments, which DNA ligase later joins. The leading strand is made continuously."
+        },
+        {
+            "id": "zoo-009",
+            "subject": "zoology",
+            "unit": "genetics-evolution",
+            "class_level": "12",
+            "chapter": "Molecular Basis of Inheritance",
+            "topic": "Genetic code",
+            "text": "The codon AUG codes for:",
+            "options": [
+                "Methionine",
+                "Tryptophan",
+                "Serine",
+                "It is a stop codon"
+            ],
+            "correct_index": 0,
+            "explanation": "AUG codes for methionine and also acts as the initiation codon. Tryptophan is coded only by UGG, and the stop codons are UAA, UAG and UGA."
+        },
+        {
+            "id": "zoo-010",
+            "subject": "zoology",
+            "unit": "genetics-evolution",
+            "class_level": "12",
+            "chapter": "Evolution",
+            "topic": "Evidences of evolution",
+            "text": "Homologous organs, such as the forelimbs of a whale and a bat, are examples of:",
+            "options": [
+                "Convergent evolution",
+                "Divergent evolution",
+                "Genetic drift",
+                "Founder effect"
+            ],
+            "correct_index": 1,
+            "explanation": "Homologous organs have the same basic structure but different functions, which points to a common ancestor and adaptive radiation (divergent evolution). Analogous organs, such as the wings of a butterfly and a bird, show convergent evolution."
+        },
+        {
+            "id": "zoo-011",
+            "subject": "zoology",
+            "unit": "health-and-disease",
+            "class_level": "12",
+            "chapter": "Human Health and Disease",
+            "topic": "Malaria",
+            "difficulty": "medium",
+            "text": "The stage of the malarial parasite that is infective to humans is the:",
+            "options": [
+                "Merozoite",
+                "Sporozoite",
+                "Gametocyte",
+                "Trophozoite"
+            ],
+            "correct_index": 1,
+            "explanation": "Sporozoites are injected into the human bloodstream by the bite of an infected female Anopheles mosquito. Gametocytes are the stage taken up by the mosquito, and merozoites and trophozoites are stages inside red blood cells."
+        },
+        {
+            "id": "zoo-012",
+            "subject": "zoology",
+            "unit": "cell-biology",
+            "chapter": "Cell Cycle and Cell Division",
+            "topic": "Meiosis",
+            "difficulty": "medium",
+            "text": "Crossing over between non-sister chromatids of homologous chromosomes occurs during:",
+            "options": [
+                "Leptotene",
+                "Zygotene",
+                "Pachytene",
+                "Diplotene"
+            ],
+            "correct_index": 2,
+            "explanation": "Crossing over takes place in the pachytene stage of prophase I, aided by recombination nodules. Pairing of homologues (synapsis) happens in zygotene, and in diplotene the chiasmata become visible as the synaptonemal complex dissolves."
+        },
+        {
+            "id": "zoo-013",
+            "subject": "zoology",
+            "unit": "structural-organisation",
+            "chapter": "Structural Organisation in Animals",
+            "topic": "Connective tissue",
+            "text": "Which connective tissue connects a skeletal muscle to a bone?",
+            "options": [
+                "Ligament",
+                "Tendon",
+                "Cartilage",
+                "Areolar tissue"
+            ],
+            "correct_index": 1,
+            "explanation": "Tendons are dense regular connective tissue that attach muscles to bones. Ligaments join one bone to another, and cartilage and areolar tissue do not link muscle to bone."
+        },
+        {
+            "id": "zoo-014",
+            "subject": "zoology",
+            "unit": "diversity-of-life",
+            "chapter": "Animal Kingdom",
+            "topic": "Classes of vertebrates",
+            "text": "Which of the following is a cartilaginous fish?",
+            "options": [
+                "Labeo",
+                "Catla",
+                "Scoliodon",
+                "Exocoetus"
+            ],
+            "correct_index": 2,
+            "explanation": "Scoliodon (the dogfish shark) belongs to class Chondrichthyes and has a cartilaginous endoskeleton. Labeo and Catla are bony fishes, and Exocoetus (the flying fish) is also a bony fish."
+        },
+        {
+            "id": "zoo-015",
+            "subject": "zoology",
+            "unit": "cell-biology",
+            "chapter": "Cell: The Unit of Life",
+            "topic": "Plasma membrane",
+            "text": "The fluid mosaic model of the plasma membrane was proposed by:",
+            "options": [
+                "Davson and Danielli",
+                "Singer and Nicolson",
+                "Watson and Crick",
+                "Robertson"
+            ],
+            "correct_index": 1,
+            "explanation": "Singer and Nicolson (1972) described proteins floating in a fluid lipid bilayer. Davson and Danielli proposed the earlier sandwich model of a lipid layer coated with protein, and Robertson proposed the unit membrane."
+        }
+    ]
+}
