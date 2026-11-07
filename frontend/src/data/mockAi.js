@@ -8,12 +8,6 @@ export const welcomeMessage = {
     sources: [],
 }
 
-export const diagramTemplates = [
-    { keywords: ['respiratory', 'lung'], title: 'Human Respiratory System', labels: ['Nasal cavity', 'Trachea', 'Bronchi', 'Bronchioles', 'Alveoli', 'Diaphragm'] },
-    { keywords: ['heart'], title: 'Human Heart', labels: ['Aorta', 'Pulmonary artery', 'Right atrium', 'Left atrium', 'Right ventricle', 'Left ventricle'] },
-    { keywords: ['cell'], title: 'Plant Cell', labels: ['Cell wall', 'Chloroplast', 'Nucleus', 'Vacuole', 'Mitochondrion', 'Ribosomes'] },
-]
-
 export const promptTiles = [
     { id: 'explain', label: 'Explain a concept', icon: BookOpen, tint: 'bg-[#e3f6d8] text-success', tab: 'chat', prompt: 'Explain photosynthesis in simple steps for NEET.' },
     { id: 'analyze', label: 'Analyze a biology image', icon: ImageIcon, tint: 'bg-[#e5deff] text-brand-purple', tab: 'analyze' },

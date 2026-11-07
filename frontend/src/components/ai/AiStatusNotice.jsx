@@ -6,11 +6,21 @@ const OFFLINE_PROBLEM = {
     text: 'The AI engine (Ollama) is not running. Start Ollama, then check again.',
 }
 
+function getChatModelProblem(status) {
+    if (status.isChatModelInstalled) {
+        return null
+    }
+
+    return {
+        text: `The chat model “${status.chatModel}” is not installed. Run: ollama pull ${status.chatModel}`,
+    }
+}
+
 function getChatProblem(status) {
-    if (!status.isChatModelInstalled) {
-        return {
-            text: `The chat model “${status.chatModel}” is not installed. Run: ollama pull ${status.chatModel}`,
-        }
+    const modelProblem = getChatModelProblem(status)
+
+    if (modelProblem) {
+        return modelProblem
     }
 
     if (!status.isEmbedModelInstalled || status.knowledgeChunks === 0) {
@@ -34,6 +44,7 @@ function getVisionProblem(status) {
 
 const features = {
     chat: { fetchStatus: getAiStatus, getProblem: getChatProblem },
+    generate: { fetchStatus: getAiStatus, getProblem: getChatModelProblem },
     vision: { fetchStatus: getVisionStatus, getProblem: getVisionProblem },
 }
 

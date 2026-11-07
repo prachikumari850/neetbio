@@ -48,6 +48,12 @@ class Settings(BaseSettings):
     vision_context_tokens: int = 4096
     vision_max_new_tokens: int = 600
 
+    diagram_read_timeout_s: float = 300
+    diagram_max_new_tokens: int = 700
+    diagram_temperature: float = 0.2
+    diagram_max_attempts: int = 2
+    saved_diagram_limit: int = 30
+
     max_upload_bytes: int = 5 * 1024 * 1024
     max_image_pixels: int = 25_000_000
     image_max_side: int = 1024

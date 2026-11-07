@@ -21,6 +21,10 @@ class OllamaUnavailable(OllamaError):
     pass
 
 
+class InvalidModelOutput(OllamaError):
+    pass
+
+
 def _timeout(read_seconds: float | None = None) -> httpx.Timeout:
     settings = get_settings()
     return httpx.Timeout(
@@ -98,6 +102,57 @@ async def embed(texts: list[str]) -> list[list[float]]:
         )
 
     return response.json()["embeddings"]
+
+
+async def generate_json(messages: list[dict], schema: dict) -> dict:
+    settings = get_settings()
+    payload = {
+        "model": settings.ollama_chat_model,
+        "messages": messages,
+        "stream": False,
+        "format": schema,
+        "keep_alive": settings.ollama_keep_alive,
+        "options": {
+            "num_ctx": settings.chat_context_tokens,
+            "num_predict": settings.diagram_max_new_tokens,
+            "temperature": settings.diagram_temperature,
+        },
+    }
+
+    try:
+        async with httpx.AsyncClient(
+            base_url=settings.ollama_base_url,
+            timeout=_timeout(settings.diagram_read_timeout_s),
+        ) as client:
+            response = await client.post("/api/chat", json=payload)
+    except httpx.ConnectError as error:
+        raise _unavailable() from error
+    except httpx.TimeoutException as error:
+        raise OllamaError(
+            "The model took too long to respond. Try a simpler request."
+        ) from error
+    except httpx.HTTPError as error:
+        raise OllamaError("The connection to Ollama was interrupted.") from error
+
+    if response.status_code != 200:
+        raise OllamaError(
+            describe_failure(
+                response.status_code, response.content, settings.ollama_chat_model
+            )
+        )
+
+    try:
+        content = response.json().get("message", {}).get("content", "")
+        parsed = json.loads(content)
+    except (ValueError, AttributeError) as error:
+        raise InvalidModelOutput(
+            "The model did not return a valid diagram description."
+        ) from error
+
+    if not isinstance(parsed, dict):
+        raise InvalidModelOutput("The model did not return a valid diagram description.")
+
+    return parsed
 
 
 async def _stream_model(

@@ -1,5 +1,3 @@
-import { diagramTemplates } from '@/data/mockAi'
-
 const STOP_WORDS = new Set([
     'the', 'and', 'that', 'with', 'this', 'from', 'are', 'for', 'was', 'were',
     'which', 'their', 'have', 'has', 'into', 'also', 'such', 'can', 'its', 'but',
@@ -11,22 +9,6 @@ export function createMessage(role, content) {
         id: `${role}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         role,
         content,
-    }
-}
-
-export function findDiagramTemplate(prompt) {
-    const text = prompt.toLowerCase()
-    const match = diagramTemplates.find(({ keywords }) =>
-        keywords.some((keyword) => text.includes(keyword)),
-    )
-
-    if (match) {
-        return match
-    }
-
-    return {
-        title: prompt.trim().slice(0, 40),
-        labels: ['Structure A', 'Structure B', 'Structure C', 'Structure D'],
     }
 }
 

@@ -16,12 +16,18 @@ function GenerateSideCard({ generation, onGenerate }) {
                     <textarea
                         aria-label="Diagram description"
                         value={generation.prompt}
+                        maxLength={300}
+                        disabled={generation.isGenerating}
                         onChange={(event) => generation.setPrompt(event.target.value)}
                         rows={3}
-                        className="border-line w-full resize-none rounded-2xl border bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-purple/40"
+                        className="border-line focus:ring-brand-purple/40 w-full resize-none rounded-2xl border bg-white px-3 py-2 text-sm outline-none focus:ring-2"
                     />
-                    <Button onClick={onGenerate} className="mt-3 w-full">
-                        Generate
+                    <Button
+                        onClick={onGenerate}
+                        disabled={generation.isGenerating}
+                        className="mt-3 w-full"
+                    >
+                        {generation.isGenerating ? 'Generating...' : 'Generate'}
                         <Sparkles className="size-4" />
                     </Button>
                 </div>

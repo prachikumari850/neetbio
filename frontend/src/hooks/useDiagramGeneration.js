@@ -1,43 +1,71 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { findDiagramTemplate } from '@/utils/aiSimulator'
+import { useGeneratedDiagrams } from '@/hooks/useGeneratedDiagrams'
+import { generateDiagram, getGeneratedDiagram } from '@/services/generatedDiagramService'
 
-const GENERATION_DELAY_MS = 1200
 const DEFAULT_PROMPT = 'Generate a labelled diagram of human respiratory system for NEET.'
 
 export function useDiagramGeneration() {
     const [prompt, setPrompt] = useState(DEFAULT_PROMPT)
-    const [pendingPrompt, setPendingPrompt] = useState(null)
-    const [template, setTemplate] = useState(null)
-
-    useEffect(() => {
-        if (!pendingPrompt) {
-            return
-        }
-
-        const timer = setTimeout(() => {
-            setTemplate(findDiagramTemplate(pendingPrompt))
-            setPendingPrompt(null)
-        }, GENERATION_DELAY_MS)
-
-        return () => clearTimeout(timer)
-    }, [pendingPrompt])
+    const [diagram, setDiagram] = useState(null)
+    const [isGenerating, setIsGenerating] = useState(false)
+    const [error, setError] = useState('')
+    const saved = useGeneratedDiagrams()
 
     const generate = () => {
-        if (!prompt.trim()) {
+        const text = prompt.trim()
+
+        if (!text) {
             toast.error('Describe the diagram you want first.')
             return false
         }
 
-        setPendingPrompt(prompt)
+        if (isGenerating) {
+            return true
+        }
+
+        setIsGenerating(true)
+        setError('')
+
+        generateDiagram(text)
+            .then((result) => {
+                setDiagram(result)
+                saved.refresh()
+            })
+            .catch((generationError) => setError(generationError.message))
+            .finally(() => setIsGenerating(false))
+
         return true
+    }
+
+    const openSaved = async (item) => {
+        try {
+            setDiagram(await getGeneratedDiagram(item.id))
+            setError('')
+        } catch (openError) {
+            toast.error(openError.message)
+        }
+    }
+
+    const removeSaved = async (item) => {
+        try {
+            await saved.remove(item.id)
+            setDiagram((current) => (current?.id === item.id ? null : current))
+            toast.success('Diagram deleted')
+        } catch (removeError) {
+            toast.error(removeError.message)
+        }
     }
 
     return {
         prompt,
         setPrompt,
-        template,
-        isGenerating: Boolean(pendingPrompt),
+        diagram,
+        isGenerating,
+        error,
         generate,
+        saved,
+        openSaved,
+        removeSaved,
     }
 }
